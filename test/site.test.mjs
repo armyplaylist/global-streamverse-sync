@@ -1,8 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { Script } from "node:vm";
 import { readFileSync } from "node:fs";
 
 const html = readFileSync(new URL("../site/index.html", import.meta.url), "utf8");
+const profile = readFileSync(new URL("../site/profile.html", import.meta.url), "utf8");
 
 test("provides username/password registration and login without email", () => {
   assert.match(html, /id="loginForm"/);
@@ -46,4 +48,16 @@ test("shows the professional country ranking dashboard with live stream data", (
 test("uses the public Supabase key only as an apikey header", () => {
   assert.match(html, /apikey:SUPABASE_KEY/);
   assert.doesNotMatch(html, /Authorization:\s*["']Bearer\s*["']\s*\+\s*SUPABASE_KEY/);
+});
+
+
+test("profile exposes secure Musicat refresh and separates capture, play and record times", () => {
+  assert.match(profile, /id="refresh">Actualizar desde Musicat/);
+  assert.match(profile, /musicat_sync_requests/);
+  assert.match(profile, /last_capture_at/);
+  assert.match(profile, /last_played_at/);
+  assert.match(profile, /last_recorded_at/);
+  const match = profile.match(/<script>([\\s\\S]*?)<\\/script>/);
+  assert.ok(match, "profile script should exist");
+  assert.doesNotThrow(() => new Script(match[1]), "profile JavaScript should parse");
 });
