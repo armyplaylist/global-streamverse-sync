@@ -14,6 +14,7 @@ test("accepts a public Musicat profile URL", () => {
   const url = parseMusicatProfileUrl("https://musicat.fm/lightjjk");
   assert.equal(url.hostname, "musicat.fm");
   assert.equal(url.pathname, "/lightjjk");
+  assert.equal(parseMusicatProfileUrl("https://www.musicat.fm/lightjjk").hostname, "musicat.fm");
 });
 
 test("rejects non-Musicat and non-HTTPS profile URLs", () => {
