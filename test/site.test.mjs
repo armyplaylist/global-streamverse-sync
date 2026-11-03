@@ -57,7 +57,7 @@ test("profile exposes secure Musicat refresh and separates capture, play and rec
   assert.match(profile, /last_capture_at/);
   assert.match(profile, /last_played_at/);
   assert.match(profile, /last_recorded_at/);
-  const match = profile.match(/<script>([\\s\\S]*?)<\\/script>/);
+  const match = profile.match(/<script>([\s\S]*?)<\/script>/);
   assert.ok(match, "profile script should exist");
   assert.doesNotThrow(() => new Script(match[1]), "profile JavaScript should parse");
 });
