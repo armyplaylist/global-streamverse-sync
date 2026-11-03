@@ -51,11 +51,107 @@ export function musicatDedupeKey(row) {
   if (!Number.isFinite(timestamp.getTime())) {
     throw new Error("The Musicat play timestamp is invalid.");
   }
-  return `musicat:${row.trackId}:${timestamp.toISOString()}`;
+  return "musicat:" + row.trackId + ":" + timestamp.toISOString();
 }
 
 export function filterMusicatRowsSince(rows, since) {
   const cutoff = new Date(since).getTime();
   if (!Number.isFinite(cutoff)) throw new Error("The sync cutoff timestamp is invalid.");
   return rows.filter(row => Date.parse(row.playedAt) >= cutoff);
+}
+
+export async function collectMusicatHistorySince(page, since, options = {}) {
+  const cutoff = new Date(since).getTime();
+  if (!Number.isFinite(cutoff)) throw new Error("The sync cutoff timestamp is invalid.");
+
+  const maxScrollBatches = Number.isInteger(options.maxScrollBatches)
+    ? Math.max(0, options.maxScrollBatches)
+    : 100;
+  const waitForRowsMs = Number.isInteger(options.waitForRowsMs)
+    ? Math.max(1000, options.waitForRowsMs)
+    : 12000;
+
+  await page.waitForSelector("time[datetime]", { timeout: 20000 });
+  await page.waitForTimeout(1200);
+
+  const readRows = () => page.evaluate(() => {
+    return [...document.querySelectorAll('time[datetime]')].map(time => {
+      const row = time.closest('div[class*="PlayedMusic_row"]');
+      if (!row) return null;
+
+      const titleLink = row.querySelector('a[class*="PlayedMusic_title"]');
+      const artistNode = row.querySelector('[class*="PlayedMusic_artists"]');
+      const sourceNode = row.querySelector('[class*="PlayedMusic_played"]');
+      const trackHref = titleLink?.getAttribute("href")
+        || row.querySelector('a[href^="/tracks/"]')?.getAttribute("href")
+        || "";
+      const trackId = trackHref.match(/^\/tracks\/([^/?#]+)/)?.[1] || null;
+
+      return {
+        trackId,
+        title: titleLink?.innerText?.trim() || "",
+        artist: artistNode?.innerText?.trim() || "",
+        playedAt: time.getAttribute("datetime") || "",
+        source: sourceNode?.innerText?.trim() || ""
+      };
+    }).filter(Boolean);
+  });
+
+  const unique = new Map();
+  let scrollBatches = 0;
+  let reachedCutoff = false;
+  let oldestLoaded = null;
+  let latestLoaded = null;
+
+  while (true) {
+    const rawRows = await readRows();
+    const rows = normalizeMusicatRows(rawRows);
+    if (rows.length === 0) {
+      throw new Error("Musicat history rendered no complete rows with a track, artist and timestamp.");
+    }
+    if (rows.length !== rawRows.length) {
+      throw new Error("At least one visible Musicat history row was incomplete; sync stopped to avoid silent omissions.");
+    }
+
+    const timestamps = rows.map(row => Date.parse(row.playedAt));
+    for (let index = 1; index < timestamps.length; index += 1) {
+      if (timestamps[index] > timestamps[index - 1]) {
+        throw new Error("Musicat history is not ordered newest-first; sync stopped to avoid missing events.");
+      }
+    }
+
+    oldestLoaded = new Date(Math.min(...timestamps)).toISOString();
+    latestLoaded = new Date(Math.max(...timestamps)).toISOString();
+
+    for (const row of rows) unique.set(musicatDedupeKey(row), row);
+
+    if (Date.parse(oldestLoaded) <= cutoff) {
+      reachedCutoff = true;
+      break;
+    }
+    if (scrollBatches >= maxScrollBatches) break;
+
+    const previousCount = await page.locator("time[datetime]").count();
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    try {
+      await page.waitForFunction(
+        previous => document.querySelectorAll("time[datetime]").length > previous,
+        previousCount,
+        { timeout: waitForRowsMs }
+      );
+      scrollBatches += 1;
+    } catch {
+      break;
+    }
+  }
+
+  const events = filterMusicatRowsSince([...unique.values()], since);
+  return {
+    events,
+    visibleUniqueRows: unique.size,
+    scrollBatches,
+    reachedCutoff,
+    oldestLoaded,
+    latestLoaded
+  };
 }

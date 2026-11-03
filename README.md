@@ -1,51 +1,37 @@
-# GLOBAL STREAMVERSE — Musicat sync
+# GLOBAL STREAMVERSE — Musicat Sync
 
-Independent worker for GLOBAL STREAMVERSE. This repository is intentionally separate from the ARMY playlist and voting projects.
+This repository contains the read-only public-history validator and the guarded Musicat sync worker for GLOBAL STREAMVERSE.
 
-## Product rules
+## Verified behavior
 
-- No rankings, leaderboards, or song/artist popularity tables.
-- Store individual listening events only: participant, country, track, artist, and the timestamp shown in Musicat.
-- A participant's counting window begins at their integration/approval timestamp. Older history must never be counted.
-- Read only the public Musicat website as a normal browser user. Do not call Musicat private APIs, websockets, or Spotify APIs.
-- Deduplicate every event. Re-running a sync must not increase totals for an event already stored.
-- Never guess a timestamp, artist, track, or country. If the public UI cannot be read reliably, fail the sync and report the reason.
-- Participants must explicitly consent and be approved before collection starts.
+- Public Musicat profile navigation was verified with a clean browser session.
+- The history page exposes timestamped visible play rows even when a session notice is displayed.
+- The validation workflow successfully read 200 rows across three incremental scroll batches.
+- Every validated row had a track title, artist, stable track ID and ISO timestamp.
+- Validation is read-only: it does not write to Supabase or count plays.
 
-## Current verified state (2026-11-03)
+## Sync design
 
-- Supabase project and tables exist: `participants`, `stream_events`, `sync_runs`, and `country_totals`.
-- Existing Supabase Edge Function `sync-participant` is only a guarded placeholder and returns `CONNECTOR_PENDING_VALIDATION`. It does not import events.
-- A previous browser check could render a Musicat history page and inspect recent rows. A fresh check on 2026-11-03 was stopped by Musicat's message: "The state of your account has changed. Please log in again." The history is therefore not currently validated as reliably readable without an authenticated Musicat session.
-- No participant records or listening events have been inserted.
-- No scheduled sync is active.
+The worker reads only approved Musicat participants from Supabase and reads the visible public Musicat history UI with Playwright. It does not use Musicat internal APIs, Spotify APIs, or Spotify account credentials.
 
-## Planned worker
+For each participant:
+1. The first sync cutoff is the participant's created_at timestamp (integration time).
+2. Later syncs use last_synced_at with a five-minute overlap to recover delayed rows safely.
+3. History rows are read newest-first, loading additional visible batches until the cutoff is reached.
+4. Events before the cutoff are excluded.
+5. Each event uses the Musicat track ID and exact play timestamp as its deduplication key.
+6. The worker writes to stream_events; existing database triggers maintain country totals.
+7. If history loading is incomplete, the cursor is not advanced. The next run retries the missing range.
 
-1. Read only approved, consented participants from Supabase.
-2. Open each participant's public Musicat profile and visible history in Playwright.
-3. Parse only clearly identified visible track/artist/timestamp rows.
-4. Discard events older than the participant's `created_at` integration boundary.
-5. Insert rows with a deterministic deduplication key; rely on database uniqueness to make retries safe.
-6. Record sync status and last successful sync. Country totals are derived from saved individual events.
+## Required protected setting
 
-## Required repository Actions secrets
+The manual worker workflow requires a GitHub Actions repository secret named SUPABASE_SECRET_KEY. Create a dedicated Supabase secret API key for this worker and store it only as that GitHub secret. Never commit it, put it in browser code, or send it in chat.
 
-Before enabling a scheduled workflow, configure these in **Settings → Secrets and variables → Actions → New repository secret**:
+The worker workflow is manual-only until the protected secret is configured and an end-to-end test passes. A scheduled trigger is deliberately not enabled yet.
 
-- `SUPABASE_URL`: project URL.
-- `SUPABASE_SERVICE_ROLE_KEY`: Supabase service-role key. Keep it secret; never put it in source code, commits, browser code, or chat.
+## Workflows
 
-The worker must use the service-role key only in the GitHub Actions runtime. Do not add a secret until the browser parser and database write path have been tested end-to-end.
+- Validate public Musicat history — safe read-only browser validation and unit tests.
+- Sync approved Musicat profiles — writes events to Supabase and is gated by the protected secret above.
 
-## Safety / rollout gate
-
-Do not enable scheduled collection until all of the following pass:
-
-- Musicat history is accessible through the public UI without relying on a private account session.
-- DOM parsing is validated against actual visible rows and their timestamps.
-- Integration-time cutoff and deduplication are tested.
-- A test event is inserted into Supabase and verified; then the test data is removed or clearly marked.
-- A sync run reports success only after the database confirms inserts/upserts.
-
-Until then, the production site and existing Supabase tables remain unchanged.
+No song, album, or artist rankings are produced by this project.

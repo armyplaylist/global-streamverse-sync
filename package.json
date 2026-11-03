@@ -4,7 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "check": "node scripts/check-musicat.mjs"
+    "check": "node scripts/check-musicat.mjs",
+    "sync": "node scripts/sync-musicat.mjs",
+    "test": "node --test"
   },
   "devDependencies": {
     "playwright": "1.56.1"
