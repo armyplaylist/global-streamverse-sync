@@ -3,6 +3,8 @@ import assert from "node:assert/strict";
 import {
   extractMusicatUserId,
   filterMusicatRowsSince,
+  hasReachedMusicatIntegrationCutoff,
+  musicatInitialBackfillCutoff,
   musicatDedupeKey,
   normalizeMusicatRows,
   parseMusicatProfileUrl
@@ -66,5 +68,52 @@ test("filters inclusively from the participant integration or previous-sync cuto
   assert.deepEqual(
     filterMusicatRowsSince(rows, "2026-11-03T02:05:00.000Z").map(row => row.playedAt),
     ["2026-11-03T02:05:00.000Z", "2026-11-03T02:10:00.000Z"]
+  );
+});
+
+test("resumes an initial backfill just before the saved timestamp", () => {
+  assert.equal(
+    musicatInitialBackfillCutoff(
+      "2026-11-01T00:00:00.000Z",
+      "2026-11-02T12:00:00.000Z"
+    ),
+    "2026-11-02T11:59:59.999Z"
+  );
+});
+
+test("never moves the backfill cursor earlier than participant integration", () => {
+  assert.equal(
+    musicatInitialBackfillCutoff(
+      "2026-11-02T00:00:00.000Z",
+      "2026-11-01T12:00:00.000Z"
+    ),
+    "2026-11-02T00:00:00.000Z"
+  );
+});
+
+test("recognizes the integration cutoff or a confirmed exhausted public history", () => {
+  assert.equal(
+    hasReachedMusicatIntegrationCutoff(
+      "2026-11-02T00:00:00.000Z",
+      "2026-11-02T01:00:00.000Z",
+      false
+    ),
+    true
+  );
+  assert.equal(
+    hasReachedMusicatIntegrationCutoff(
+      "2026-11-02T02:00:00.000Z",
+      "2026-11-02T01:00:00.000Z",
+      true
+    ),
+    true
+  );
+  assert.equal(
+    hasReachedMusicatIntegrationCutoff(
+      "2026-11-02T02:00:00.000Z",
+      "2026-11-02T01:00:00.000Z",
+      false
+    ),
+    false
   );
 });
