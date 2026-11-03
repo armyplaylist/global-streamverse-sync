@@ -1,11 +1,14 @@
 name: Validate public Musicat history
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
     inputs:
-      profile_url: https://musicat.fm/lightjjk
-        description: Public Musicat profile URL (https://musicat.fm/lightjjk)
+      profile_url:
+        description: Public Musicat profile URL
         required: true
+        default: https://musicat.fm/lightjjk
         type: string
 
 permissions:
@@ -29,5 +32,5 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Validate public profile and history
         env:
-          MUSICAT_PROFILE_URL: ${{ inputs.profile_url }}
+          MUSICAT_PROFILE_URL: ${{ inputs.profile_url || 'https://musicat.fm/lightjjk' }}
         run: npm run check
