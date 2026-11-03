@@ -1,6 +1,6 @@
 # GLOBAL STREAMVERSE — Musicat Sync
 
-This repository contains the read-only public-history validator and the guarded Musicat sync worker for GLOBAL STREAMVERSE.
+This repository contains the GLOBAL STREAMVERSE frontend (`site/index.html`), public-history validator, and guarded Musicat sync worker.
 
 ## Verified behavior
 
@@ -12,16 +12,17 @@ This repository contains the read-only public-history validator and the guarded 
 
 ## Sync design
 
-The worker reads only approved Musicat participants from Supabase and reads the visible public Musicat history UI with Playwright. It does not use Musicat internal APIs, Spotify APIs, or Spotify account credentials.
+The worker reads only approved Musicat participants from Supabase and reads the visible public Musicat history UI with Playwright. The public frontend collects the country, public profile URL and explicit consent; no private Musicat or Spotify credentials are requested. It does not use Musicat internal APIs, Spotify APIs, or Spotify account credentials.
 
 For each participant:
 1. The first sync cutoff is the participant's created_at timestamp (integration time).
-2. Later syncs use last_synced_at with a five-minute overlap to recover delayed rows safely.
-3. History rows are read newest-first, loading additional visible batches until the cutoff is reached.
-4. Events before the cutoff are excluded.
-5. Each event uses the Musicat track ID and exact play timestamp as its deduplication key.
-6. The worker writes to stream_events; existing database triggers maintain country totals.
-7. If history loading is incomplete, the cursor is not advanced. The next run retries the missing range.
+2. If a first-time backfill exceeds the per-run scroll limit, history_cursor_at stores the oldest timestamp reached and the next run resumes immediately before that cursor.
+3. Later syncs use last_synced_at with a five-minute overlap to recover delayed rows safely.
+4. History rows are read newest-first, loading additional visible batches until the cutoff or the end of the public history is confirmed.
+5. Events before the original integration timestamp are excluded.
+6. Each event uses the Musicat track ID and exact play timestamp as its deduplication key.
+7. The worker writes to stream_events; existing database triggers maintain country totals.
+8. If history loading is incomplete, the cursor is not advanced. The next run retries from the saved history cursor.
 
 ## Required protected setting
 
