@@ -26,7 +26,10 @@ test("shows public nickname and country flag directory, not account credentials"
   assert.match(html, /id="memberDirectory"/);
   assert.match(html, /countryFlag\(m\.country_code\)/);
   assert.match(html, /display_name,country_code,created_at/);
-  assert.doesNotMatch(html, /password\s*:\s*[^,}]+.*participant_directory/s);
+  assert.match(html, /participant_directory\?select=display_name,country_code,created_at/);
+  assert.doesNotMatch(html, /participant_directory\?select=[^"`]*\b(?:login_username|password|provider_username|public_profile_url)\b/i);
+  assert.match(html, /name\.textContent=m\.display_name/);
+  assert.match(html, /country\.textContent=COUNTRY_NAMES\[m\.country_code\]/);
 });
 
 test("shows country totals only and contains no ranking or leaderboard UI", () => {
