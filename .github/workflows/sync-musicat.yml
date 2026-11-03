@@ -2,7 +2,7 @@ name: Sync approved Musicat profiles
 
 on:
   schedule:
-    - cron: "3-59/10 * * * *"
+    - cron: "*/5 * * * *"
   workflow_dispatch:
   push:
     branches: [main]
@@ -63,4 +63,5 @@ jobs:
           SUPABASE_URL: https://ylybwiwemlnekclrwwjq.supabase.co
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
           MAX_PARTICIPANTS_PER_RUN: "20"
+          MUSICAT_SYNC_OVERLAP_MS: "7200000"
         run: npm run sync
