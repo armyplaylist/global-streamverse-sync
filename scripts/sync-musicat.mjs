@@ -32,7 +32,6 @@ async function supabaseRequest(path, options = {}) {
     method: options.method || "GET",
     headers: {
       apikey: SUPABASE_SECRET_KEY,
-      Authorization: `Bearer ${SUPABASE_SECRET_KEY}`,
       "Content-Type": "application/json",
       ...(options.prefer ? { Prefer: options.prefer } : {}),
       ...(options.headers || {})
