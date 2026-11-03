@@ -4,6 +4,8 @@ on:
   schedule:
     - cron: "*/5 * * * *"
   workflow_dispatch:
+  push:
+    branches: [main]
 
 permissions:
   contents: read
@@ -42,6 +44,10 @@ jobs:
             echo "::error::The protected SUPABASE_SECRET_KEY repository secret has not been configured."
             exit 1
           fi
+          case "$SUPABASE_SECRET_KEY" in
+            sb_secret_*) echo "Supabase secret key format detected." ;;
+            *) echo "::error::SUPABASE_SECRET_KEY must contain the Supabase secret API key (sb_secret_...), not the publishable key."; exit 1 ;;
+          esac
       - name: Automatically validate and approve pending Musicat profiles
         env:
           SUPABASE_URL: https://ylybwiwemlnekclrwwjq.supabase.co
