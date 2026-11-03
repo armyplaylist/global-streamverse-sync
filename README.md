@@ -26,13 +26,13 @@ For each participant:
 
 ## Required protected setting
 
-The manual worker workflow requires a GitHub Actions repository secret named SUPABASE_SECRET_KEY. Create a dedicated Supabase secret API key for this worker and store it only as that GitHub secret. Never commit it, put it in browser code, or send it in chat.
+The worker requires a GitHub Actions repository secret named `SUPABASE_SECRET_KEY`. It must be a dedicated Supabase secret API key stored only as that GitHub secret. Never commit it, put it in browser code, or send it in chat.
 
-The worker workflow is manual-only until the protected secret is configured and an end-to-end test passes. A scheduled trigger is deliberately not enabled yet.
+The sync workflow runs automatically every 10 minutes, can also be started manually, and runs on pushes to `main`. It checks the protected secret before accessing Supabase, validates pending public profiles, and then syncs approved profiles. The public page refreshes displayed country totals every five minutes so new totals appear after a sync finishes.
 
 ## Workflows
 
 - Validate public Musicat history — safe read-only browser validation and unit tests.
-- Sync approved Musicat profiles — writes events to Supabase and is gated by the protected secret above.
+- Sync approved Musicat profiles — scheduled every 10 minutes, with manual and main-branch push triggers.
 
 No song, album, or artist rankings are produced by this project.
