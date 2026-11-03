@@ -197,14 +197,14 @@ async function importEvents(participant, events) {
 
 async function syncParticipant(browser, participant) {
   const runId = await startSyncRun(participant.id);
-  await updateSyncRequests(participant.id, "pending", {
-    status: "processing",
-    started_at: new Date().toISOString(),
-    error_message: null
-  });
   let importedCount = 0;
   let page = null;
   try {
+    await updateSyncRequests(participant.id, "pending", {
+      status: "processing",
+      started_at: new Date().toISOString(),
+      error_message: null
+    });
     const createdAt = Date.parse(participant.created_at);
     if (!Number.isFinite(createdAt)) throw new Error("Participant has an invalid integration timestamp.");
 
