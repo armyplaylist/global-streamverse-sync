@@ -6,6 +6,8 @@ on:
     paths:
       - ".github/workflows/validate-musicat.yml"
       - "scripts/check-musicat.mjs"
+      - "scripts/sync-musicat.mjs"
+      - ".github/workflows/sync-musicat.yml"
       - "src/musicat-reader.mjs"
       - "test/**"
       - "package.json"
@@ -37,6 +39,8 @@ jobs:
         run: npm ci --ignore-scripts
       - name: Run unit tests
         run: npm test
+      - name: Check sync worker syntax
+        run: node --check scripts/sync-musicat.mjs
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
       - name: Validate public profile and history
