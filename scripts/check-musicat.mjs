@@ -13,7 +13,7 @@ try {
   console.error("MUSICAT_PROFILE_URL is not a valid URL.");
   process.exit(2);
 }
-if (parsed.hostname !== "musicat.fm" || parsed.protocol !== "https:") {
+if (!["musicat.fm", "www.musicat.fm"].includes(parsed.hostname) || parsed.protocol !== "https:") {
   console.error("Only https://musicat.fm public profile URLs are allowed.");
   process.exit(2);
 }
