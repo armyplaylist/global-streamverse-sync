@@ -32,10 +32,15 @@ test("shows public nickname and country flag directory, not account credentials"
   assert.match(html, /country\.textContent=COUNTRY_NAMES\[m\.country_code\]/);
 });
 
-test("shows country totals only and contains no ranking or leaderboard UI", () => {
+test("shows the professional country ranking dashboard with live stream data", () => {
   assert.match(html, /id="countryTotals"/);
+  assert.match(html, /id="countryChart"/);
+  assert.match(html, /id="globalStreams"/);
+  assert.match(html, /id="activeCountries"/);
+  assert.match(html, /id="leadingCountry"/);
   assert.match(html, /loadCountryTotals\(\)/);
-  assert.doesNotMatch(html, /ranking|rankings|leaderboard|top contributors|cuadro de honor/i);
+  assert.match(html, /order=total_streams\.desc/);
+  assert.match(html, /Ranking global de streams BTS/);
 });
 
 test("uses the public Supabase key only as an apikey header", () => {
