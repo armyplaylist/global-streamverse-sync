@@ -80,7 +80,7 @@ async function updateParticipant(participantId, patch) {
 }
 
 async function fetchApprovedParticipants() {
-  const query = "participants?select=id,country_code,public_profile_url,created_at,last_synced_at"
+  const query = "participants?select=id,country_code,public_profile_url,created_at,last_synced_at,history_cursor_at"
     + "&provider=eq.musicat&status=eq.approved"
     + "&order=last_synced_at.asc.nullsfirst,created_at.asc"
     + "&limit=" + MAX_PARTICIPANTS;
@@ -157,7 +157,18 @@ async function syncParticipant(browser, participant) {
     if (participant.last_synced_at && !Number.isFinite(previousSync)) {
       throw new Error("Participant has an invalid last sync timestamp.");
     }
-    const cutoffMs = previousSync === null ? createdAt : Math.max(createdAt, previousSync - OVERLAP_MS);
+    const historyCursor = participant.history_cursor_at ? Date.parse(participant.history_cursor_at) : null;
+    if (participant.history_cursor_at && !Number.isFinite(historyCursor)) {
+      throw new Error("Participant has an invalid initial-history cursor.");
+    }
+
+    const isInitialBackfill = previousSync === null;
+    const isResumingBackfill = isInitialBackfill && historyCursor !== null;
+    const cutoffMs = !isInitialBackfill
+      ? Math.max(createdAt, previousSync - OVERLAP_MS)
+      : isResumingBackfill
+        ? Math.max(createdAt, historyCursor - 1)
+        : createdAt;
     const cutoff = new Date(cutoffMs).toISOString();
 
     const opened = await openMusicatHistory(browser, participant.public_profile_url);
@@ -166,10 +177,35 @@ async function syncParticipant(browser, participant) {
       maxScrollBatches: MAX_SCROLL_BATCHES
     });
 
-    importedCount = await importEvents(participant, result.events);
+    // During a multi-run initial backfill, older pages can contain rows from
+    // before registration. Always apply the original registration timestamp.
+    const eligibleEvents = isInitialBackfill
+      ? result.events.filter(event => Date.parse(event.playedAt) >= createdAt)
+      : result.events;
+    importedCount = await importEvents(participant, eligibleEvents);
 
-    if (!result.reachedCutoff) {
-      const message = "History limit reached before the sync cutoff; retrying from the previous cursor.";
+    const reachedRegistrationCutoff = Date.parse(result.oldestLoaded) <= createdAt;
+    if (isInitialBackfill && !reachedRegistrationCutoff) {
+      const nextCursor = result.oldestLoaded;
+      const message = "Initial history backfill is continuing from the saved cursor.";
+      await updateParticipant(participant.id, {
+        history_cursor_at: nextCursor,
+        last_error: message
+      });
+      await finishSyncRun(runId, "partial", importedCount, message);
+      return {
+        participantId: participant.id,
+        status: "partial",
+        importedCount,
+        loadedRows: result.visibleUniqueRows,
+        nextCursor
+      };
+    }
+
+    // If an incremental scan hits its configured safety limit, keep the
+    // previous successful timestamp so the next run safely retries the range.
+    if (!isInitialBackfill && !result.reachedCutoff) {
+      const message = "Incremental history limit reached; the previous sync cursor was preserved for retry.";
       await updateParticipant(participant.id, { last_error: message });
       await finishSyncRun(runId, "partial", importedCount, message);
       return { participantId: participant.id, status: "partial", importedCount, loadedRows: result.visibleUniqueRows };
@@ -178,6 +214,7 @@ async function syncParticipant(browser, participant) {
     const syncedAt = new Date().toISOString();
     await updateParticipant(participant.id, {
       last_synced_at: syncedAt,
+      history_cursor_at: null,
       last_error: null
     });
     await finishSyncRun(runId, "success", importedCount, null);
