@@ -9,6 +9,8 @@ on:
       - "scripts/sync-musicat.mjs"
       - ".github/workflows/sync-musicat.yml"
       - "src/musicat-reader.mjs"
+      - "site/**"
+      - "supabase/migrations/**"
       - "test/**"
       - "package.json"
       - "package-lock.json"
