@@ -1,4 +1,5 @@
 import { chromium } from "playwright";
+import { supabaseApiHeaders } from "./supabase-api.mjs";
 import {
   collectMusicatHistorySince,
   hasReachedMusicatIntegrationCutoff,
@@ -30,12 +31,10 @@ if (!Number.isInteger(MAX_PARTICIPANTS) || MAX_PARTICIPANTS < 1 || MAX_PARTICIPA
 async function supabaseRequest(path, options = {}) {
   const response = await fetch(SUPABASE_URL + "/rest/v1/" + path, {
     method: options.method || "GET",
-    headers: {
-      apikey: SUPABASE_SECRET_KEY,
-      "Content-Type": "application/json",
+    headers: supabaseApiHeaders(SUPABASE_SECRET_KEY, {
       ...(options.prefer ? { Prefer: options.prefer } : {}),
       ...(options.headers || {})
-    },
+    }),
     body: options.body === undefined ? undefined : JSON.stringify(options.body)
   });
   const text = await response.text();
