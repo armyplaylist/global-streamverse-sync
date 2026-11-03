@@ -1,0 +1,33 @@
+name: Validate public Musicat history
+
+on:
+  workflow_dispatch:
+    inputs:
+      profile_url:
+        description: Public Musicat profile URL (https://musicat.fm/username)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm install --ignore-scripts
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Validate public profile and history
+        env:
+          MUSICAT_PROFILE_URL: ${{ inputs.profile_url }}
+        run: npm run check
