@@ -28,7 +28,7 @@ For each participant:
 
 The worker requires a GitHub Actions repository secret named `SUPABASE_SECRET_KEY`. It must be a dedicated Supabase secret API key stored only as that GitHub secret. Never commit it, put it in browser code, or send it in chat.
 
-The sync workflow runs automatically every 10 minutes, can also be started manually, and runs on pushes to `main`. It checks the protected secret before accessing Supabase, validates pending public profiles, and then syncs approved profiles. The public page refreshes displayed country totals every five minutes so new totals appear after a sync finishes.
+The sync workflow runs automatically every five minutes, can also be started manually, and runs on pushes to `main`. It checks the protected secret before accessing Supabase, validates pending public profiles, and then syncs approved profiles. The private profile's **Actualizar desde Musicat** button inserts a protected sync request; the worker prioritizes that participant on its next scheduled run, reports whether the capture completed, and keeps the request queued if a paginated history scan must continue. The request survives closing the page. The public page refreshes displayed country totals every five minutes so new totals appear after a sync finishes. The personal profile distinguishes the last successful Musicat capture, the timestamp of the newest play reported by Musicat, and when the newest event was inserted into Streamverse.
 
 ## Workflows
 
