@@ -37,8 +37,9 @@ try {
   const uuid = await page.evaluate(() => {
     const href = [...document.querySelectorAll('a[href^="/users/"]')]
       .map(a => a.getAttribute("href") || "")
-      .find(href => /^\\/users\\/[0-9a-f-]{36}(?:\\/|$)/i.test(href));
-    return href?.match(/^\\/users\\/([0-9a-f-]{36})/i)?.[1] || null;
+      .find(value => value.split("/")[2]?.length === 36);
+    const candidate = href?.split("/")[2] || "";
+    return /^[0-9a-f-]{36}$/i.test(candidate) ? candidate : null;
   });
   if (!uuid) throw new Error("Could not identify a public history route from rendered profile markup.");
   const historyUrl = new URL(`/users/${uuid}/history`, "https://musicat.fm");
