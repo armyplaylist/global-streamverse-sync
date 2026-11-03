@@ -7,7 +7,9 @@ if (!profileUrl) {
 }
 
 let parsed;
-try { parsed = new URL(profileUrl); } catch {
+try {
+  parsed = new URL(profileUrl);
+} catch {
   console.error("MUSICAT_PROFILE_URL is not a valid URL.");
   process.exit(2);
 }
@@ -19,51 +21,117 @@ if (parsed.hostname !== "musicat.fm" || parsed.protocol !== "https:") {
 const browser = await chromium.launch({ headless: true });
 try {
   const page = await browser.newPage({ viewport: { width: 1365, height: 900 } });
-  const response = await page.goto(profileUrl, { waitUntil: "domcontentloaded", timeout: 60000 });
-  await page.waitForTimeout(5000);
-  const profile = await page.evaluate(() => ({
-    title: document.title,
-    text: document.body?.innerText || "",
-    html: document.documentElement?.outerHTML || ""
-  }));
-  if (!response?.ok()) throw new Error(`Public profile returned HTTP ${response?.status() ?? "no response"}`);
-  if (!profile.text.trim()) throw new Error("Public profile rendered no visible text.");
-  if (/please log in|log in again|account has changed|state of your account has changed/i.test(profile.text)) {
-    throw new Error("Musicat requires an account session; public history validation stopped.");
+  const profileResponse = await page.goto(profileUrl, {
+    waitUntil: "domcontentloaded",
+    timeout: 60000
+  });
+  await page.waitForTimeout(2500);
+
+  if (!profileResponse?.ok()) {
+    throw new Error(`Public profile returned HTTP ${profileResponse?.status() ?? "no response"}`);
   }
 
-  // Profile visibility alone is not enough: history must be visibly accessible.
-  // Resolve the user's public history route only from a UUID present in rendered page markup.
-  const uuid = await page.evaluate(() => {
-    const href = [...document.querySelectorAll('a[href^="/users/"]')]
-      .map(a => a.getAttribute("href") || "")
-      .find(value => value.split("/")[2]?.length === 36);
-    const candidate = href?.split("/")[2] || "";
-    return /^[0-9a-f-]{36}$/i.test(candidate) ? candidate : null;
-  });
-  if (!uuid) throw new Error("Could not identify a public history route from rendered profile markup.");
-  const historyUrl = new URL(`/users/${uuid}/history`, "https://musicat.fm");
-  await page.goto(historyUrl.toString(), { waitUntil: "domcontentloaded", timeout: 60000 });
-  await page.waitForTimeout(5000);
-  const history = await page.evaluate(() => ({
+  const profile = await page.evaluate(() => ({
     title: document.title,
-    text: document.body?.innerText || "",
-    rows: [...document.querySelectorAll("time")].map(el => ({
-      text: el.parentElement?.parentElement?.innerText || el.parentElement?.innerText || "",
-      datetime: el.getAttribute("datetime")
-    })).filter(x => x.text && x.datetime)
+    visibleText: document.body?.innerText || "",
+    userLinks: [...document.querySelectorAll('a[href^="/users/"]')]
+      .map(link => link.getAttribute("href") || "")
   }));
-  if (/please log in|log in again|account has changed|state of your account has changed/i.test(history.text)) {
-    throw new Error("Musicat history is gated by a login/session message.");
+  if (!profile.visibleText.trim()) {
+    throw new Error("Public profile rendered no visible text.");
   }
-  if (!history.rows.length) {
-    throw new Error("No timestamped visible history rows were detected; no data was collected.");
+
+  const uuid = profile.userLinks
+    .map(href => href.match(/^\/users\/([0-9a-f-]{36})(?:\/|$)/i)?.[1])
+    .find(Boolean);
+  if (!uuid) {
+    throw new Error("Could not identify the public user history route from profile links.");
   }
+
+  const historyUrl = new URL(`/users/${uuid}/history`, "https://musicat.fm");
+  const historyResponse = await page.goto(historyUrl.toString(), {
+    waitUntil: "domcontentloaded",
+    timeout: 60000
+  });
+  if (!historyResponse?.ok()) {
+    throw new Error(`History returned HTTP ${historyResponse?.status() ?? "no response"}`);
+  }
+
+  await page.waitForSelector("time[datetime]", { timeout: 20000 });
+
+  const readVisibleRows = () => page.evaluate(() => {
+    return [...document.querySelectorAll("time[datetime]")].map(time => {
+      const row = time.closest('div[class*="PlayedMusic_row"]');
+      if (!row) return null;
+
+      const titleLink = row.querySelector('a[class*="PlayedMusic_title"]');
+      const artistNode = row.querySelector('[class*="PlayedMusic_artists"]');
+      const sourceNode = row.querySelector('[class*="PlayedMusic_played"]');
+      const trackHref = titleLink?.getAttribute("href")
+        || row.querySelector('a[href^="/tracks/"]')?.getAttribute("href")
+        || "";
+      const trackId = trackHref.match(/^\/tracks\/([^/?#]+)/)?.[1] || null;
+
+      return {
+        trackId,
+        title: titleLink?.innerText?.trim() || "",
+        artist: artistNode?.innerText?.trim() || "",
+        playedAt: time.getAttribute("datetime") || "",
+        source: sourceNode?.innerText?.trim() || ""
+      };
+    }).filter(Boolean);
+  });
+
+  let rows = await readVisibleRows();
+  let scrollBatches = 0;
+  // Musicat progressively reveals 50 more visible history rows near the bottom.
+  // This validation loads a few pages only; it never stores or counts streams.
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const previousCount = rows.length;
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    try {
+      await page.waitForFunction(
+        previous => document.querySelectorAll("time[datetime]").length > previous,
+        previousCount,
+        { timeout: 12000 }
+      );
+      scrollBatches += 1;
+      rows = await readVisibleRows();
+    } catch {
+      break;
+    }
+  }
+
+  const validRows = rows.filter(row =>
+    row.trackId &&
+    row.title &&
+    row.artist &&
+    row.source &&
+    Number.isFinite(Date.parse(row.playedAt))
+  );
+  const uniqueKeys = new Set(validRows.map(row => `${row.trackId}|${row.playedAt}`));
+  const dates = validRows.map(row => Date.parse(row.playedAt)).sort((a, b) => a - b);
+  const sessionNoticeVisible = /state of your account has changed|please log in again/i
+    .test(await page.locator("body").innerText());
+
+  if (validRows.length === 0) {
+    throw new Error("History opened, but no complete visible rows with title, artist and timestamp were detected.");
+  }
+  if (validRows.length !== rows.length) {
+    throw new Error(`Some visible history rows were incomplete: ${validRows.length}/${rows.length} valid.`);
+  }
+
   console.log(JSON.stringify({
     status: "validated",
     profile: parsed.pathname,
-    historyTitle: history.title,
-    visibleTimestampedRows: history.rows.length,
+    historyTitle: await page.title(),
+    visibleTimestampedRows: rows.length,
+    validRows: validRows.length,
+    uniqueEvents: uniqueKeys.size,
+    scrollBatches,
+    earliestVisiblePlay: new Date(dates[0]).toISOString(),
+    latestVisiblePlay: new Date(dates.at(-1)).toISOString(),
+    sessionNoticeVisible,
     note: "Validation only. No listening data was stored or counted."
   }, null, 2));
 } finally {
