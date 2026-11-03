@@ -170,8 +170,10 @@ export async function collectMusicatHistorySince(page, since, options = {}) {
       noGrowthAttempts = 0;
     } catch {
       noGrowthAttempts += 1;
-      if (noGrowthAttempts >= 2) endOfHistory = true;
-      break;
+      if (noGrowthAttempts >= 2) {
+        endOfHistory = true;
+        break;
+      }
     }
   }
 
