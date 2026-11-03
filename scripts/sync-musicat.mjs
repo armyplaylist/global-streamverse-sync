@@ -1,6 +1,8 @@
 import { chromium } from "playwright";
 import {
   collectMusicatHistorySince,
+  hasReachedMusicatIntegrationCutoff,
+  musicatInitialBackfillCutoff,
   extractMusicatUserId,
   musicatDedupeKey,
   parseMusicatProfileUrl
@@ -163,13 +165,9 @@ async function syncParticipant(browser, participant) {
     }
 
     const isInitialBackfill = previousSync === null;
-    const isResumingBackfill = isInitialBackfill && historyCursor !== null;
-    const cutoffMs = !isInitialBackfill
-      ? Math.max(createdAt, previousSync - OVERLAP_MS)
-      : isResumingBackfill
-        ? Math.max(createdAt, historyCursor - 1)
-        : createdAt;
-    const cutoff = new Date(cutoffMs).toISOString();
+    const cutoff = isInitialBackfill
+      ? musicatInitialBackfillCutoff(participant.created_at, participant.history_cursor_at)
+      : new Date(Math.max(createdAt, previousSync - OVERLAP_MS)).toISOString();
 
     const opened = await openMusicatHistory(browser, participant.public_profile_url);
     page = opened.page;
@@ -184,7 +182,11 @@ async function syncParticipant(browser, participant) {
       : result.events;
     importedCount = await importEvents(participant, eligibleEvents);
 
-    const reachedRegistrationCutoff = Date.parse(result.oldestLoaded) <= createdAt;
+    const reachedRegistrationCutoff = hasReachedMusicatIntegrationCutoff(
+      result.oldestLoaded,
+      participant.created_at,
+      result.endOfHistory
+    );
     if (isInitialBackfill && !reachedRegistrationCutoff) {
       const nextCursor = result.oldestLoaded;
       const message = "Initial history backfill is continuing from the saved cursor.";
@@ -204,7 +206,7 @@ async function syncParticipant(browser, participant) {
 
     // If an incremental scan hits its configured safety limit, keep the
     // previous successful timestamp so the next run safely retries the range.
-    if (!isInitialBackfill && !result.reachedCutoff) {
+    if (!isInitialBackfill && !result.reachedCutoff && !result.endOfHistory) {
       const message = "Incremental history limit reached; the previous sync cursor was preserved for retry.";
       await updateParticipant(participant.id, { last_error: message });
       await finishSyncRun(runId, "partial", importedCount, message);
