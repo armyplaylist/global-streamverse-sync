@@ -100,11 +100,29 @@ async function openMusicatHistory(browser, profileUrl) {
       throw new Error("Musicat profile returned HTTP " + (profileResponse?.status() ?? "no response"));
     }
     await page.waitForTimeout(1500);
-    const hrefs = await page.evaluate(() =>
-      [...document.querySelectorAll('a[href^="/users/"]')].map(link => link.getAttribute("href") || "")
-    );
-    const userId = extractMusicatUserId(hrefs);
-    if (!userId) throw new Error("The public Musicat profile did not expose a user history link.");
+    const profileLinkDiagnostics = await page.evaluate(() => {
+      const paths = [...document.querySelectorAll("a[href]")]
+        .map(link => {
+          try {
+            const url = new URL(link.getAttribute("href") || "", location.origin);
+            return url.origin === location.origin ? url.pathname : null;
+          } catch {
+            return null;
+          }
+        })
+        .filter(Boolean);
+      return {
+        profilePath: location.pathname,
+        pageTitle: document.title,
+        sameOriginLinkCount: paths.length,
+        uniqueLinkPaths: [...new Set(paths)].slice(0, 80)
+      };
+    });
+    const userId = extractMusicatUserId(profileLinkDiagnostics.uniqueLinkPaths);
+    if (!userId) {
+      console.error("Musicat public profile link diagnostics:", JSON.stringify(profileLinkDiagnostics));
+      throw new Error("The public Musicat profile did not expose a recognized user history link.");
+    }
 
     const historyUrl = new URL("/users/" + userId + "/history", "https://musicat.fm");
     const historyResponse = await page.goto(historyUrl.toString(), {
