@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       profile_url: https://musicat.fm/lightjjk
-        description: Public Musicat profile URL (https://musicat.fm/username)
+        description: Public Musicat profile URL (https://musicat.fm/lightjjk)
         required: true
         type: string
 
