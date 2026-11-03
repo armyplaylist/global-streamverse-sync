@@ -1,6 +1,6 @@
 import { chromium } from "playwright";
 import { supabaseApiHeaders } from "./supabase-api.mjs";
-import { parseMusicatProfileUrl, extractMusicatUserId } from "../src/musicat-reader.mjs";
+import { parseMusicatProfileUrl, waitForMusicatUserId } from "../src/musicat-reader.mjs";
 
 const SUPABASE_URL = (process.env.SUPABASE_URL || "https://ylybwiwemlnekclrwwjq.supabase.co").replace(/\/$/, "");
 const SUPABASE_SECRET_KEY = process.env.SUPABASE_SECRET_KEY;
@@ -57,16 +57,15 @@ async function validatePublicProfile(browser, rawUrl) {
     }
     if (!profileResponse.ok()) return { valid: false, permanent: true, reason: "Musicat no permite abrir este perfil públicamente (HTTP " + profileResponse.status() + ")." };
 
-    await page.waitForTimeout(1800);
-    const profileData = await page.evaluate(() => ({
-      text: document.body?.innerText || "",
-      links: [...document.querySelectorAll('a[href^="/users/"]')].map(a => a.getAttribute("href") || "")
-    }));
-    if (!profileData.text.trim()) {
+    await page.waitForTimeout(500);
+    const profileText = await page.evaluate(() => document.body?.innerText || "");
+    if (!profileText.trim()) {
       return { valid: false, permanent: false, reason: "El perfil no terminó de cargar; se volverá a intentar." };
     }
-    const userId = extractMusicatUserId(profileData.links);
-    if (!userId) return { valid: false, permanent: true, reason: "El enlace no corresponde a un perfil público válido de Musicat." };
+    const userId = await waitForMusicatUserId(page, 15000);
+    if (!userId) {
+      return { valid: false, permanent: false, reason: "Musicat aún no ha terminado de cargar el enlace del historial; se volverá a intentar." };
+    }
 
     const historyUrl = new URL("/users/" + userId + "/history", "https://musicat.fm");
     const historyResponse = await page.goto(historyUrl.toString(), { waitUntil: "domcontentloaded", timeout: 45000 });

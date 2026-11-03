@@ -4,7 +4,7 @@ import {
   collectMusicatHistorySince,
   hasReachedMusicatIntegrationCutoff,
   musicatInitialBackfillCutoff,
-  extractMusicatUserId,
+  waitForMusicatUserId,
   musicatDedupeKey,
   parseMusicatProfileUrl
 } from "../src/musicat-reader.mjs";
@@ -99,33 +99,9 @@ async function openMusicatHistory(browser, profileUrl) {
     if (!profileResponse?.ok()) {
       throw new Error("Musicat profile returned HTTP " + (profileResponse?.status() ?? "no response"));
     }
-    await page.waitForTimeout(1500);
-    const profileLinkDiagnostics = await page.evaluate(() => {
-      const paths = [...document.querySelectorAll("a[href]")]
-        .map(link => {
-          try {
-            const url = new URL(link.getAttribute("href") || "", location.origin);
-            return url.origin === location.origin ? url.pathname : null;
-          } catch {
-            return null;
-          }
-        })
-        .filter(Boolean);
-      const uniqueLinkPaths = [...new Set(paths)];
-      return {
-        hrefs: uniqueLinkPaths,
-        diagnostics: {
-          profilePath: location.pathname,
-          pageTitle: document.title,
-          sameOriginLinkCount: paths.length,
-          uniqueLinkPaths: uniqueLinkPaths.slice(0, 80)
-        }
-      };
-    });
-    const userId = extractMusicatUserId(profileLinkDiagnostics.hrefs);
+    const userId = await waitForMusicatUserId(page, 15000);
     if (!userId) {
-      console.error("Musicat public profile link diagnostics:", JSON.stringify(profileLinkDiagnostics.diagnostics));
-      throw new Error("The public Musicat profile did not expose a recognized user history link.");
+      throw new Error("Musicat did not finish loading a valid public user history link after 15 seconds.");
     }
 
     const historyUrl = new URL("/users/" + userId + "/history", "https://musicat.fm");

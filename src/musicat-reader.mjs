@@ -23,6 +23,41 @@ export function extractMusicatUserId(hrefs) {
   return null;
 }
 
+export async function waitForMusicatUserId(page, timeoutMs = 15000) {
+  const timeout = Number.isInteger(timeoutMs)
+    ? Math.max(1000, Math.min(timeoutMs, 30000))
+    : 15000;
+
+  try {
+    await page.waitForFunction(
+      () => [...document.querySelectorAll("a[href]")].some(link => {
+        const href = link.getAttribute("href") || "";
+        try {
+          const url = new URL(href, location.origin);
+          return url.origin === location.origin
+            && /^\/users\/[0-9a-f-]{36}(?:\/|$)/i.test(url.pathname);
+        } catch {
+          return false;
+        }
+      }),
+      null,
+      { timeout }
+    );
+  } catch {
+    // Keep going so callers can distinguish a delayed link from an empty profile.
+  }
+
+  const hrefs = await page.evaluate(() => [...document.querySelectorAll("a[href]")].map(link => {
+    try {
+      const url = new URL(link.getAttribute("href") || "", location.origin);
+      return url.origin === location.origin ? url.pathname : "";
+    } catch {
+      return "";
+    }
+  }));
+  return extractMusicatUserId(hrefs);
+}
+
 export function normalizeMusicatRows(rows) {
   const normalized = [];
   for (const row of rows) {

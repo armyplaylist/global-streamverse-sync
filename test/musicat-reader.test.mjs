@@ -7,7 +7,8 @@ import {
   musicatInitialBackfillCutoff,
   musicatDedupeKey,
   normalizeMusicatRows,
-  parseMusicatProfileUrl
+  parseMusicatProfileUrl,
+  waitForMusicatUserId
 } from "../src/musicat-reader.mjs";
 
 test("accepts a public Musicat profile URL", () => {
@@ -32,6 +33,30 @@ test("extracts only a user UUID from a visible /users/ route", () => {
     "a26e7b80-9a8d-4dc3-b7d8-59fc7a21b672"
   );
   assert.equal(extractMusicatUserId(["/tracks/a26e7b80-9a8d-4dc3-b7d8-59fc7a21b672"]), null);
+});
+
+test("waits for the public Musicat user history link to hydrate", async () => {
+  const userId = "a26e7b80-9a8d-4dc3-b7d8-59fc7a21b672";
+  let waited = false;
+  const page = {
+    waitForFunction: async (_predicate, _argument, options) => {
+      waited = true;
+      assert.equal(options.timeout, 2000);
+    },
+    evaluate: async () => ["/users/undefined", "/users/" + userId + "/history"]
+  };
+
+  assert.equal(await waitForMusicatUserId(page, 2000), userId);
+  assert.equal(waited, true);
+});
+
+test("returns null when the public Musicat page only exposes an undefined user route", async () => {
+  const page = {
+    waitForFunction: async () => { throw new Error("timeout"); },
+    evaluate: async () => ["/users/undefined", "/users/not-a-uuid/history"]
+  };
+
+  assert.equal(await waitForMusicatUserId(page, 2000), null);
 });
 
 test("normalizes complete visible rows and skips incomplete rows", () => {
