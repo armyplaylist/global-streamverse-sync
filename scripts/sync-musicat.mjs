@@ -111,16 +111,20 @@ async function openMusicatHistory(browser, profileUrl) {
           }
         })
         .filter(Boolean);
+      const uniqueLinkPaths = [...new Set(paths)];
       return {
-        profilePath: location.pathname,
-        pageTitle: document.title,
-        sameOriginLinkCount: paths.length,
-        uniqueLinkPaths: [...new Set(paths)].slice(0, 80)
+        hrefs: uniqueLinkPaths,
+        diagnostics: {
+          profilePath: location.pathname,
+          pageTitle: document.title,
+          sameOriginLinkCount: paths.length,
+          uniqueLinkPaths: uniqueLinkPaths.slice(0, 80)
+        }
       };
     });
-    const userId = extractMusicatUserId(profileLinkDiagnostics.uniqueLinkPaths);
+    const userId = extractMusicatUserId(profileLinkDiagnostics.hrefs);
     if (!userId) {
-      console.error("Musicat public profile link diagnostics:", JSON.stringify(profileLinkDiagnostics));
+      console.error("Musicat public profile link diagnostics:", JSON.stringify(profileLinkDiagnostics.diagnostics));
       throw new Error("The public Musicat profile did not expose a recognized user history link.");
     }
 
