@@ -80,12 +80,63 @@ async function updateParticipant(participantId, patch) {
   });
 }
 
+async function fetchPendingSyncRequests() {
+  const staleBefore = new Date(Date.now() - 15 * 60 * 1000).toISOString();
+  await supabaseRequest(
+    "musicat_sync_requests?status=eq.processing&started_at=lt." + encodeURIComponent(staleBefore),
+    {
+      method: "PATCH",
+      prefer: "return=minimal",
+      body: {
+        status: "pending",
+        started_at: null,
+        error_message: "A previous capture was interrupted; this request was returned to the queue."
+      }
+    }
+  );
+
+  return await supabaseRequest(
+    "musicat_sync_requests?select=id,participant_id&status=eq.pending&order=requested_at.asc&limit=100"
+  ) || [];
+}
+
+async function updateSyncRequests(participantId, fromStatus, patch) {
+  await supabaseRequest(
+    "musicat_sync_requests?participant_id=eq." + encodeURIComponent(participantId)
+      + "&status=eq." + encodeURIComponent(fromStatus),
+    {
+      method: "PATCH",
+      prefer: "return=minimal",
+      body: patch
+    }
+  );
+}
+
 async function fetchApprovedParticipants() {
-  const query = "participants?select=id,country_code,public_profile_url,created_at,last_synced_at,history_cursor_at"
-    + "&provider=eq.musicat&status=eq.approved"
-    + "&order=last_synced_at.asc.nullsfirst,created_at.asc"
-    + "&limit=" + MAX_PARTICIPANTS;
-  return await supabaseRequest(query) || [];
+  const columns = "id,country_code,public_profile_url,created_at,last_synced_at,history_cursor_at";
+  const requests = await fetchPendingSyncRequests();
+  const requestedIds = [...new Set(requests.map(request => request.participant_id).filter(Boolean))];
+
+  let requestedParticipants = [];
+  if (requestedIds.length) {
+    requestedParticipants = await supabaseRequest(
+      "participants?select=" + columns
+        + "&provider=eq.musicat&status=eq.approved"
+        + "&id=in.(" + requestedIds.join(",") + ")"
+        + "&limit=" + MAX_PARTICIPANTS
+    ) || [];
+  }
+
+  const regularParticipants = await supabaseRequest(
+    "participants?select=" + columns
+      + "&provider=eq.musicat&status=eq.approved"
+      + "&order=last_synced_at.asc.nullsfirst,created_at.asc"
+      + "&limit=" + MAX_PARTICIPANTS
+  ) || [];
+
+  const combined = [...requestedParticipants, ...regularParticipants];
+  const unique = new Map(combined.map(participant => [participant.id, participant]));
+  return [...unique.values()].slice(0, MAX_PARTICIPANTS);
 }
 
 async function openMusicatHistory(browser, profileUrl) {
@@ -146,6 +197,11 @@ async function importEvents(participant, events) {
 
 async function syncParticipant(browser, participant) {
   const runId = await startSyncRun(participant.id);
+  await updateSyncRequests(participant.id, "pending", {
+    status: "processing",
+    started_at: new Date().toISOString(),
+    error_message: null
+  });
   let importedCount = 0;
   let page = null;
   try {
@@ -191,6 +247,11 @@ async function syncParticipant(browser, participant) {
         history_cursor_at: nextCursor,
         last_error: message
       });
+      await updateSyncRequests(participant.id, "processing", {
+        status: "pending",
+        started_at: null,
+        error_message: message
+      });
       await finishSyncRun(runId, "partial", importedCount, message);
       return {
         participantId: participant.id,
@@ -206,6 +267,11 @@ async function syncParticipant(browser, participant) {
     if (!isInitialBackfill && !result.reachedCutoff && !result.endOfHistory) {
       const message = "Incremental history limit reached; the previous sync cursor was preserved for retry.";
       await updateParticipant(participant.id, { last_error: message });
+      await updateSyncRequests(participant.id, "processing", {
+        status: "pending",
+        started_at: null,
+        error_message: message
+      });
       await finishSyncRun(runId, "partial", importedCount, message);
       return { participantId: participant.id, status: "partial", importedCount, loadedRows: result.visibleUniqueRows };
     }
@@ -215,6 +281,12 @@ async function syncParticipant(browser, participant) {
       last_synced_at: syncedAt,
       history_cursor_at: null,
       last_error: null
+    });
+    await updateSyncRequests(participant.id, "processing", {
+      status: "completed",
+      completed_at: syncedAt,
+      imported_count: importedCount,
+      error_message: null
     });
     await finishSyncRun(runId, "success", importedCount, null);
     return {
@@ -230,6 +302,16 @@ async function syncParticipant(browser, participant) {
       await updateParticipant(participant.id, { last_error: message });
     } catch {
       // Preserve the original error; sync run logging below is best-effort.
+    }
+    try {
+      await updateSyncRequests(participant.id, "processing", {
+        status: "failed",
+        completed_at: new Date().toISOString(),
+        imported_count: importedCount,
+        error_message: message
+      });
+    } catch {
+      // Preserve the original error if request finalization also fails.
     }
     try {
       await finishSyncRun(runId, "failed", importedCount, message);
