@@ -3,7 +3,7 @@ name: Validate public Musicat history
 on:
   workflow_dispatch:
     inputs:
-      profile_url:
+      profile_url: https://musicat.fm/lightjjk.
         description: Public Musicat profile URL (https://musicat.fm/username)
         required: true
         type: string
