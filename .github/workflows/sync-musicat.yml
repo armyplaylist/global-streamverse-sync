@@ -32,6 +32,7 @@ jobs:
         run: npm test
       - name: Check approval and sync scripts
         run: |
+          node --check scripts/supabase-api.mjs
           node --check scripts/approve-musicat-participants.mjs
           node --check scripts/sync-musicat.mjs
       - name: Install Chromium
@@ -44,10 +45,13 @@ jobs:
             echo "::error::The protected SUPABASE_SECRET_KEY repository secret has not been configured."
             exit 1
           fi
-          case "$SUPABASE_SECRET_KEY" in
-            sb_secret_*) echo "Supabase secret key format detected." ;;
-            *) echo "::error::SUPABASE_SECRET_KEY must contain the Supabase secret API key (sb_secret_...), not the publishable key."; exit 1 ;;
-          esac
+          node --input-type=module <<'NODE'
+          import { detectSupabaseCredentialType } from "./scripts/supabase-api.mjs";
+          const type = detectSupabaseCredentialType(process.env.SUPABASE_SECRET_KEY);
+          console.log(type === "new-secret"
+            ? "Modern Supabase secret key detected."
+            : "Legacy Supabase service_role key detected.");
+          NODE
       - name: Automatically validate and approve pending Musicat profiles
         env:
           SUPABASE_URL: https://ylybwiwemlnekclrwwjq.supabase.co
