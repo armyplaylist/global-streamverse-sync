@@ -60,6 +60,31 @@ export function filterMusicatRowsSince(rows, since) {
   return rows.filter(row => Date.parse(row.playedAt) >= cutoff);
 }
 
+export function musicatInitialBackfillCutoff(createdAt, cursor = null) {
+  const signupTime = new Date(createdAt).getTime();
+  if (!Number.isFinite(signupTime)) {
+    throw new Error("The participant integration timestamp is invalid.");
+  }
+  if (cursor === null || cursor === undefined || cursor === "") {
+    return new Date(signupTime).toISOString();
+  }
+  const cursorTime = new Date(cursor).getTime();
+  if (!Number.isFinite(cursorTime)) {
+    throw new Error("The initial Musicat history cursor is invalid.");
+  }
+  return new Date(Math.max(signupTime, cursorTime - 1)).toISOString();
+}
+
+export function hasReachedMusicatIntegrationCutoff(oldestLoaded, createdAt, endOfHistory = false) {
+  if (endOfHistory) return true;
+  const oldestTime = new Date(oldestLoaded).getTime();
+  const signupTime = new Date(createdAt).getTime();
+  if (!Number.isFinite(oldestTime) || !Number.isFinite(signupTime)) {
+    throw new Error("Cannot verify the Musicat integration cutoff.");
+  }
+  return oldestTime <= signupTime;
+}
+
 export async function collectMusicatHistorySince(page, since, options = {}) {
   const cutoff = new Date(since).getTime();
   if (!Number.isFinite(cutoff)) throw new Error("The sync cutoff timestamp is invalid.");
@@ -102,6 +127,8 @@ export async function collectMusicatHistorySince(page, since, options = {}) {
   let reachedCutoff = false;
   let oldestLoaded = null;
   let latestLoaded = null;
+  let noGrowthAttempts = 0;
+  let endOfHistory = false;
 
   while (true) {
     const rawRows = await readRows();
@@ -140,7 +167,10 @@ export async function collectMusicatHistorySince(page, since, options = {}) {
         { timeout: waitForRowsMs }
       );
       scrollBatches += 1;
+      noGrowthAttempts = 0;
     } catch {
+      noGrowthAttempts += 1;
+      if (noGrowthAttempts >= 2) endOfHistory = true;
       break;
     }
   }
@@ -151,6 +181,7 @@ export async function collectMusicatHistorySince(page, since, options = {}) {
     visibleUniqueRows: unique.size,
     scrollBatches,
     reachedCutoff,
+    endOfHistory,
     oldestLoaded,
     latestLoaded
   };
