@@ -28,7 +28,7 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Verify protected secret exists
         env:
-          SUPABASE_SECRET_KEY: \${{ secrets.SUPABASE_SECRET_KEY }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
         run: |
           if [ -z "$SUPABASE_SECRET_KEY" ]; then
             echo "::error::The protected SUPABASE_SECRET_KEY repository secret has not been configured."
@@ -37,5 +37,5 @@ jobs:
       - name: Sync approved Musicat profiles
         env:
           SUPABASE_URL: https://ylybwiwemlnekclrwwjq.supabase.co
-          SUPABASE_SECRET_KEY: \${{ secrets.SUPABASE_SECRET_KEY }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
         run: npm run sync
