@@ -131,6 +131,19 @@ document.getElementById("profileStatus").textContent="Datos actualizados · "+ne
 }catch(error){box.innerHTML='<div class="empty">No pudimos cargar tu historial. Intenta actualizar en un momento.</div>';document.getElementById("profileStatus").textContent=error.message||"Error al cargar el perfil.";}
 }
 document.getElementById("refreshProfile").addEventListener("click",loadPersonalProfile);
+
+// Actualiza las estadísticas y el historial personal cada 10 minutos mientras la sesión siga activa.
+let profileRefreshInProgress=false;
+setInterval(async()=>{
+if(profileRefreshInProgress)return;
+profileRefreshInProgress=true;
+try{
+const user=await currentUser();
+if(user)await loadPersonalProfile();
+}catch(error){
+document.getElementById("profileStatus").textContent="No se pudo actualizar automáticamente. Se reintentará en 10 minutos.";
+}finally{profileRefreshInProgress=false;}
+},10*60*1000);
 async function loadMemberDirectory(){const box=document.getElementById("memberDirectory"),count=document.getElementById("memberCount");try{const response=await fetch(SUPABASE_URL+"/rest/v1/participant_directory?select=display_name,country_code,created_at&is_active=eq.true&order=created_at.desc&limit=90",{headers:{apikey:SUPABASE_KEY}});if(!response.ok)throw new Error("Directory unavailable");const members=await response.json();count.textContent=members.length+" ARMY";if(!members.length){box.innerHTML='<div class="empty">Aún no hay perfiles activados. Tu nickname y bandera aparecerán aquí cuando Musicat valide tu historial.</div>';return;}box.replaceChildren(...members.map(m=>{const card=document.createElement("article");card.className="member";const flag=document.createElement("span");flag.className="flag";flag.textContent=countryFlag(m.country_code);const meta=document.createElement("div");const name=document.createElement("b");name.textContent=m.display_name;const country=document.createElement("small");country.textContent=COUNTRY_NAMES[m.country_code]||m.country_code;meta.append(name,country);card.append(flag,meta);return card;}));}catch{box.innerHTML='<div class="empty">No pudimos cargar el directorio en este momento.</div>';count.textContent="NO DISPONIBLE";}}
 async function loadCountryTotals(){const box=document.getElementById("countryTotals"),badge=document.getElementById("countryStatus"),updated=document.getElementById("countryUpdated");try{const response=await fetch(SUPABASE_URL+"/rest/v1/country_daily_totals?select=country_code,total_streams,reset_at&order=country_code.asc&limit=100",{headers:{apikey:SUPABASE_KEY}});if(!response.ok)throw new Error("Totals unavailable");const rows=await response.json();if(!rows.length){box.innerHTML='<div class="empty">Aún no hay reproducciones BTS verificadas. Los totales aparecerán cuando se sincronicen los perfiles.</div>';badge.textContent="SIN DATOS";return;}const table=document.createElement("table");table.innerHTML="<thead><tr><th>País</th><th>Reproducciones BTS</th></tr></thead>";const tbody=document.createElement("tbody");rows.forEach(row=>{const tr=document.createElement("tr"),country=document.createElement("td"),count=document.createElement("td");country.textContent=countryFlag(row.country_code)+" "+(COUNTRY_NAMES[row.country_code]||row.country_code);count.textContent=Number(row.total_streams).toLocaleString("en-US");tr.append(country,count);tbody.append(tr);});table.append(tbody);box.replaceChildren(table);badge.textContent="ACTUALIZADO";const reset=rows[0]?.reset_at;if(reset)updated.textContent="El contador de hoy comenzó: "+new Date(reset).toLocaleString()+" · Reinicio diario: 00:00 UTC.";}catch{box.innerHTML='<div class="empty">No pudimos cargar los totales en este momento.</div>';badge.textContent="NO DISPONIBLE";}}
 loadAccount().catch(()=>{});loadMemberDirectory();loadCountryTotals();
