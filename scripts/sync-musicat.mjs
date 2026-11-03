@@ -13,7 +13,7 @@ const SUPABASE_URL = (process.env.SUPABASE_URL || "https://ylybwiwemlnekclrwwjq.
 const SUPABASE_SECRET_KEY = process.env.SUPABASE_SECRET_KEY;
 const MAX_PARTICIPANTS = Number.parseInt(process.env.MAX_PARTICIPANTS_PER_RUN || "20", 10);
 const MAX_SCROLL_BATCHES = Number.parseInt(process.env.MUSICAT_MAX_SCROLL_BATCHES || "100", 10);
-const OVERLAP_MS = Number.parseInt(process.env.MUSICAT_SYNC_OVERLAP_MS || "300000", 10);
+const OVERLAP_MS = Number.parseInt(process.env.MUSICAT_SYNC_OVERLAP_MS || "3600000", 10);
 
 if (!SUPABASE_SECRET_KEY) {
   console.error("Missing SUPABASE_SECRET_KEY. Add it as a protected GitHub Actions secret; never place it in source code.");
