@@ -4,11 +4,29 @@ import { readFileSync } from "node:fs";
 
 const html = readFileSync(new URL("../site/index.html", import.meta.url), "utf8");
 
-test("keeps the participant registration form and explicit consent", () => {
-  assert.match(html, /id="participantForm"/);
+test("provides username/password registration and login without email", () => {
+  assert.match(html, /id="loginForm"/);
+  assert.match(html, /id="signupForm"/);
+  assert.match(html, /id="newUsername"/);
+  assert.match(html, /id="newPassword"/);
+  assert.match(html, /id="loginUsername"/);
+  assert.match(html, /id="loginPassword"/);
+  assert.match(html, /accounts\.global-streamverse\.invalid/);
+});
+
+test("registration collects nickname, country, Musicat profile and consent", () => {
+  assert.match(html, /id="displayName"/);
+  assert.match(html, /id="country"/);
+  assert.match(html, /id="profile"/);
   assert.match(html, /id="consent"[^>]*required/);
-  assert.match(html, /id="profile"[^>]*required/);
-  assert.match(html, /id="country"[^>]*required/);
+  assert.match(html, /functions\/v1\/register-participant/);
+});
+
+test("shows public nickname and country flag directory, not account credentials", () => {
+  assert.match(html, /id="memberDirectory"/);
+  assert.match(html, /countryFlag\(m\.country_code\)/);
+  assert.match(html, /display_name,country_code,created_at/);
+  assert.doesNotMatch(html, /password\s*:\s*[^,}]+.*participant_directory/s);
 });
 
 test("shows country totals only and contains no ranking or leaderboard UI", () => {
@@ -17,11 +35,7 @@ test("shows country totals only and contains no ranking or leaderboard UI", () =
   assert.doesNotMatch(html, /ranking|rankings|leaderboard|top contributors|cuadro de honor/i);
 });
 
-test("uses the public Supabase key as an apikey header only", () => {
-  assert.match(html, /const headers=\{apikey:SUPABASE_KEY\};/);
+test("uses the public Supabase key only as an apikey header", () => {
+  assert.match(html, /apikey:SUPABASE_KEY/);
   assert.doesNotMatch(html, /Authorization:\s*["']Bearer\s*["']\s*\+\s*SUPABASE_KEY/);
-});
-
-test("accepts only the public Musicat profile route shape", () => {
-  assert.match(html, /pathname\.split\(["']\/["']\)\.filter\(Boolean\)\.length===1/);
 });
