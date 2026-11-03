@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f7f5fc">
+<meta name="description" content="GLOBAL STREAMVERSE · Recuento global de canciones BTS con portadas y metadatos de Spotify.">
+<title>Song charts · GLOBAL STREAMVERSE</title>
+<style>
+:root{color-scheme:light;--bg:#f7f5fc;--ink:#292238;--muted:#716a80;--line:#e5def1;--violet:#7952c7;--soft:#f1ebfa}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 80% 0%,#e8dcff,transparent 40%),var(--bg);color:var(--ink);font:15px/1.55 Inter,system-ui,sans-serif}.wrap{width:min(100% - 32px,1040px);margin:auto}header{padding:17px 0;border-bottom:1px solid var(--line)}.nav{display:flex;justify-content:space-between;align-items:center;gap:12px}.brand{font-weight:900;letter-spacing:.12em;text-decoration:none;color:var(--ink)}.brand span{color:var(--violet)}.btn{display:inline-flex;padding:9px 13px;border:1px solid #d9cbed;border-radius:11px;background:#f0eafa;color:#513c78;font-weight:800;text-decoration:none;font-size:12px}
+.hero{padding:38px 0 22px}.eyebrow{color:#7952c7;font-size:11px;font-weight:850;letter-spacing:.16em;text-transform:uppercase}.hero h1{font-size:clamp(34px,7vw,54px);line-height:1.02;letter-spacing:-.04em;margin:8px 0}.hero p{max-width:700px;color:var(--muted);margin:8px 0}.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:20px 0}.stat,.toolbar,.song{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 8px 24px #39265d08}.stat{padding:14px}.stat small{display:block;color:var(--muted);font-size:11px}.stat strong{display:block;font-size:25px;margin-top:3px;font-variant-numeric:tabular-nums}.toolbar{padding:14px;margin:18px 0;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.periods{display:flex;gap:7px;flex-wrap:wrap}.period{border:1px solid #ded5ea;background:#f7f4fb;color:#5c526d;border-radius:10px;padding:9px 13px;font-weight:800;cursor:pointer}.period.active{background:#e9defb;border-color:#a98bdb;color:#4e347c}.search{flex:1;min-width:190px;max-width:320px;padding:10px 12px;border:1px solid #d8d0e3;border-radius:10px;font:inherit;color:var(--ink);background:white}.meta{color:var(--muted);font-size:12px;margin:0 0 12px}.songs{display:grid;gap:10px}.song{padding:12px;display:grid;grid-template-columns:76px minmax(0,1fr) auto;gap:14px;align-items:center}.cover{width:76px;height:76px;border-radius:11px;object-fit:cover;background:#f1edf6;border:1px solid #eee8f5}.cover.placeholder{display:grid;place-items:center;color:#9b8ab8;font-size:26px}.song-main{min-width:0}.song-title{font-weight:850;font-size:15px;line-height:1.3}.artist{color:#716a80;font-size:12px;margin-top:3px}.album{color:#8a8298;font-size:11px;margin-top:5px;overflow-wrap:anywhere}.tag{display:inline-block;margin-top:6px;padding:3px 7px;border-radius:7px;background:#f2edf9;color:#6e5597;font-size:10px;font-weight:800}.count{text-align:right;min-width:100px}.count strong{display:block;font-size:22px;font-variant-numeric:tabular-nums}.count small{display:block;color:#8a8298;font-size:10px}.spotify-link{display:inline-flex;align-items:center;gap:5px;color:#247347;text-decoration:none;font-size:10px;font-weight:800;margin-top:5px}.empty{padding:30px;text-align:center;background:#fff;border:1px dashed #d9cbed;border-radius:15px;color:var(--muted)}.foot{margin:26px 0 34px;color:#827991;font-size:11px}.foot a{color:#5f478c}.spotify-mark{width:17px;height:17px;vertical-align:middle}.rank{font-size:11px;color:#9388a3;font-weight:850}.status{font-size:12px;color:var(--muted);margin:12px 2px;min-height:18px}
+@media(max-width:600px){.summary{gap:7px}.stat{padding:11px 9px}.stat strong{font-size:20px}.song{grid-template-columns:64px minmax(0,1fr) auto;gap:10px;padding:10px}.cover{width:64px;height:64px}.count{min-width:74px}.count strong{font-size:18px}.count small{font-size:9px}.toolbar{align-items:stretch}.search{max-width:none;width:100%}}
+</style>
+</head>
+<body>
+<header><div class="wrap nav"><a class="brand" href="/">GLOBAL <span>STREAMVERSE</span></a><a class="btn" href="/">Volver al inicio</a></div></header>
+<main class="wrap">
+<section class="hero"><div class="eyebrow">Global song charts</div><h1>TRACKS <span style="color:#7952c7">VERSE</span></h1><p>Un recuento colectivo de las canciones registradas por GLOBAL STREAMVERSE. Cada reproducción procede del historial de Musicat de los participantes; Spotify aporta la información musical y las portadas.</p></section>
+<section class="summary"><article class="stat"><small>Reproducciones registradas</small><strong id="total">—</strong></article><article class="stat"><small>Canciones identificadas</small><strong id="identified">—</strong></article><article class="stat"><small>Canciones en catálogo</small><strong id="songsCount">—</strong></article></section>
+<section class="toolbar"><div class="periods" role="group" aria-label="Periodo"><button class="period active" data-period="total">Total</button><button class="period" data-period="today">Hoy</button><button class="period" data-period="week">7 días</button><button class="period" data-period="month">Mes</button></div><input class="search" id="search" type="search" placeholder="Buscar canción o artista…" aria-label="Buscar canción o artista"></section>
+<p class="meta" id="meta">Cargando recuento global…</p>
+<section class="songs" id="songs"><div class="empty">Preparando el catálogo de canciones…</div></section>
+<p class="status" id="status" aria-live="polite"></p>
+<p class="foot">Las portadas, los nombres de álbumes y los enlaces de catálogo se atribuyen a <a href="https://www.spotify.com/" target="_blank" rel="noopener">Spotify</a>. Las imágenes se muestran en su formato original y enlazan al contenido correspondiente. GLOBAL STREAMVERSE es un proyecto independiente de fans, no afiliado a Spotify, BTS ni HYBE. Los recuentos reflejan únicamente las reproducciones que Musicat hizo disponibles y que GLOBAL STREAMVERSE pudo registrar.</p>
+</main>
+<script>
+const SUPABASE_URL="https://ylybwiwemlnekclrwwjq.supabase.co";
+const SUPABASE_KEY="sb_publishable_CLbbu_GKYbH5sRB9R-EsSg_r3-jL9BN";
+const endpoint=SUPABASE_URL+"/functions/v1/tracks-catalog";
+let allRows=[],period="total";
+const fmt=n=>(Number(n)||0).toLocaleString("en-US");
+const esc=s=>String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function countFor(r){return Number(r[period==="today"?"today_streams":period==="week"?"week_streams":period==="month"?"month_streams":"total_streams"])||0;}
+function spotifyIcon(){return '<svg class="spotify-mark" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#1ed760"/><path d="M5.2 9.2c4.7-1.4 9.9-.9 13.6 1.4M6.1 12.3c3.9-1.1 8.3-.7 11.4 1.2M7 15.2c3.1-.8 6.4-.5 8.9.9" fill="none" stroke="#102b1b" stroke-width="1.7" stroke-linecap="round"/></svg>';}
+function render(){
+ const term=document.getElementById("search").value.trim().toLowerCase();
+ const rows=allRows.filter(r=>(String(r.track_name)+" "+String(r.artist_name)+" "+String(r.album_name||"")).toLowerCase().includes(term)).sort((a,b)=>countFor(b)-countFor(a));
+ const total=allRows.reduce((s,r)=>s+Number(r.total_streams||0),0);
+ document.getElementById("total").textContent=fmt(total);
+ document.getElementById("identified").textContent=fmt(allRows.filter(r=>r.match_status==="matched").length);
+ document.getElementById("songsCount").textContent=fmt(allRows.length);
+ document.getElementById("meta").textContent=rows.length+" canciones · ordenadas por reproducciones "+(period==="total"?"acumuladas":period==="today"?"de hoy":period==="week"?"de los últimos 7 días":"del mes")+" · reinicio diario 00:00 UTC.";
+ const box=document.getElementById("songs");
+ if(!rows.length){box.innerHTML='<div class="empty">No encontramos canciones con ese nombre o todavía no hay reproducciones registradas en este periodo.</div>';return;}
+ box.innerHTML=rows.map((r,i)=>{
+  const cover=r.match_status==="matched"&&r.album_image_url?'<a href="'+esc(r.spotify_track_url||"https://open.spotify.com/")+'" target="_blank" rel="noopener"><img class="cover" src="'+esc(r.album_image_url)+'" alt="Portada de '+esc(r.album_name||r.track_name)+'" loading="lazy"></a>':'<div class="cover placeholder">♫</div>';
+  const album=r.match_status==="matched"?(esc(r.album_name||"Álbum no indicado")+" · "+esc(r.album_type||"release")+(r.album_release_date?" · "+esc(r.album_release_date):"")):r.match_status==="ambiguous"?"Hay varias versiones posibles; identificación pendiente":"Metadatos de Spotify pendientes";
+  const link=r.match_status==="matched"&&r.spotify_track_url?'<a class="spotify-link" href="'+esc(r.spotify_track_url)+'" target="_blank" rel="noopener">'+spotifyIcon()+' Escuchar en Spotify</a>':"";
+  const tag=r.match_status==="matched"?"Spotify verificado":r.match_status==="ambiguous"?"Versión por confirmar":"Catálogo pendiente";
+  return '<article class="song">'+cover+'<div class="song-main"><div class="rank">#'+(i+1)+'</div><div class="song-title">'+esc(r.track_name)+'</div><div class="artist">'+esc(r.artist_name)+'</div><div class="album">'+album+'</div><span class="tag">'+tag+'</span><br>'+link+'</div><div class="count"><strong>'+fmt(countFor(r))+'</strong><small>reproducciones</small></div></article>';
+ }).join("");
+}
+async function load(){
+ const status=document.getElementById("status");
+ try{
+  const response=await fetch(endpoint+"?limit=250",{headers:{apikey:SUPABASE_KEY}});
+  const data=await response.json();
+  if(!response.ok)throw new Error(data.error||"No se pudo cargar el catálogo.");
+  allRows=Array.isArray(data.rows)?data.rows:[];
+  if(!data.spotify_configured)status.textContent="El recuento está disponible. Falta completar la conexión segura de Spotify para cargar las portadas y los álbumes.";
+  else if(data.spotify_error)status.textContent="El catálogo está cargado; Spotify informó: "+data.spotify_error;
+  else if(data.enriched_this_request)status.textContent="Actualizamos metadatos de Spotify para "+data.enriched_this_request+" canciones. Las demás se procesarán gradualmente.";
+  else status.textContent="Catálogo actualizado · "+new Date(data.generated_at).toLocaleString();
+  render();
+ }catch(error){status.textContent=error.message||"No pudimos conectar con el catálogo.";document.getElementById("songs").innerHTML='<div class="empty">El recuento global no está disponible temporalmente. Intenta de nuevo en unos minutos.</div>';}
+}
+document.querySelectorAll(".period").forEach(button=>button.addEventListener("click",()=>{period=button.dataset.period;document.querySelectorAll(".period").forEach(b=>b.classList.toggle("active",b===button));render();}));
+document.getElementById("search").addEventListener("input",render);
+load();setInterval(load,5*60*1000);
+</script>
+</body></html>
