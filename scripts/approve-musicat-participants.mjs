@@ -1,4 +1,5 @@
 import { chromium } from "playwright";
+import { supabaseApiHeaders } from "./supabase-api.mjs";
 import { parseMusicatProfileUrl, extractMusicatUserId } from "../src/musicat-reader.mjs";
 
 const SUPABASE_URL = (process.env.SUPABASE_URL || "https://ylybwiwemlnekclrwwjq.supabase.co").replace(/\/$/, "");
@@ -17,11 +18,7 @@ if (!Number.isInteger(MAX_PENDING) || MAX_PENDING < 1 || MAX_PENDING > 100) {
 async function db(path, options = {}) {
   const response = await fetch(SUPABASE_URL + "/rest/v1/" + path, {
     method: options.method || "GET",
-    headers: {
-      apikey: SUPABASE_SECRET_KEY,
-      "Content-Type": "application/json",
-      ...(options.prefer ? { Prefer: options.prefer } : {})
-    },
+    headers: supabaseApiHeaders(SUPABASE_SECRET_KEY, options.prefer ? { Prefer: options.prefer } : {}),
     body: options.body === undefined ? undefined : JSON.stringify(options.body)
   });
   const body = await response.text();
