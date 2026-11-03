@@ -130,12 +130,19 @@ async function importEvents(participant, events) {
     track: event.title,
     played_at: event.playedAt
   }));
-  const inserted = await supabaseRequest("stream_events?on_conflict=participant_id%2Cdedupe_key", {
-    method: "POST",
-    prefer: "resolution=ignore-duplicates,return=representation",
-    body: payload
-  });
-  return Array.isArray(inserted) ? inserted.length : 0;
+
+  let totalInserted = 0;
+  // Smaller batches make large first-time imports more reliable.
+  for (let offset = 0; offset < payload.length; offset += 250) {
+    const batch = payload.slice(offset, offset + 250);
+    const inserted = await supabaseRequest("stream_events?on_conflict=participant_id%2Cdedupe_key", {
+      method: "POST",
+      prefer: "resolution=ignore-duplicates,return=representation",
+      body: batch
+    });
+    totalInserted += Array.isArray(inserted) ? inserted.length : 0;
+  }
+  return totalInserted;
 }
 
 async function syncParticipant(browser, participant) {
