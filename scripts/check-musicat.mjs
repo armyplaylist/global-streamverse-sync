@@ -34,7 +34,12 @@ try {
 
   // Profile visibility alone is not enough: history must be visibly accessible.
   // Resolve the user's public history route only from a UUID present in rendered page markup.
-  const uuid = profile.html.match(/[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/i)?.[0];
+  const uuid = await page.evaluate(() => {
+    const href = [...document.querySelectorAll('a[href^="/users/"]')]
+      .map(a => a.getAttribute("href") || "")
+      .find(href => /^\\/users\\/[0-9a-f-]{36}(?:\\/|$)/i.test(href));
+    return href?.match(/^\\/users\\/([0-9a-f-]{36})/i)?.[1] || null;
+  });
   if (!uuid) throw new Error("Could not identify a public history route from rendered profile markup.");
   const historyUrl = new URL(`/users/${uuid}/history`, "https://musicat.fm");
   await page.goto(historyUrl.toString(), { waitUntil: "domcontentloaded", timeout: 60000 });
