@@ -5,9 +5,10 @@ export function parseMusicatProfileUrl(raw) {
   } catch {
     throw new Error("The Musicat profile URL is invalid.");
   }
-  if (url.protocol !== "https:" || url.hostname !== "musicat.fm") {
-    throw new Error("Only https://musicat.fm profiles are allowed.");
+  if (url.protocol !== "https:" || !["musicat.fm", "www.musicat.fm"].includes(url.hostname)) {
+    throw new Error("Only https://musicat.fm public profiles are allowed.");
   }
+  url.hostname = "musicat.fm";
   if (url.pathname === "/" || url.pathname.split("/").filter(Boolean).length !== 1) {
     throw new Error("Use a public Musicat profile URL, such as https://musicat.fm/username.");
   }
