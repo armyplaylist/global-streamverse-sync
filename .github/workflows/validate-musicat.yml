@@ -41,5 +41,5 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Validate public profile and history
         env:
-          MUSICAT_PROFILE_URL: \${{ inputs.profile_url || 'https://musicat.fm/lightjjk' }}
+          MUSICAT_PROFILE_URL: ${{ inputs.profile_url || 'https://musicat.fm/lightjjk' }}
         run: npm run check
