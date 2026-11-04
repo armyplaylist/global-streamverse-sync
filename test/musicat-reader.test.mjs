@@ -66,7 +66,8 @@ test("normalizes complete visible rows and skips incomplete rows", () => {
       title: " SWIM ",
       artist: " BTS ",
       playedAt: "2026-11-03T02:49:19.017Z",
-      source: "Spotify"
+      source: "Spotify",
+      album: "ARIRANG"
     },
     { trackId: "track-2", title: "No artist", artist: "", playedAt: "2026-11-03T02:50:00Z", source: "Spotify" }
   ]);
@@ -74,6 +75,7 @@ test("normalizes complete visible rows and skips incomplete rows", () => {
   assert.equal(rows[0].title, "SWIM");
   assert.equal(rows[0].artist, "BTS");
   assert.equal(rows[0].playedAt, "2026-11-03T02:49:19.017Z");
+  assert.equal(rows[0].album, "ARIRANG");
 });
 
 test("creates a stable deduplication key from the track ID and exact timestamp", () => {
@@ -142,4 +144,17 @@ test("recognizes the integration cutoff or a confirmed exhausted public history"
     ),
     false
   );
+});
+
+
+test("keeps album optional when Musicat does not expose release metadata", () => {
+  const rows = normalizeMusicatRows([{
+    trackId: "track-3",
+    title: "SWIM",
+    artist: "BTS",
+    playedAt: "2026-11-03T02:49:19.017Z",
+    source: "Spotify"
+  }]);
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].album, null);
 });
