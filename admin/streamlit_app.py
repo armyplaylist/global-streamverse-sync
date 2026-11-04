@@ -207,6 +207,11 @@ if page == "Resumen":
         st.dataframe(recent, use_container_width=True, hide_index=True)
     else:
         st.info("Aún no hay ejecuciones registradas.")
+    failures = pd.DataFrame(stats.get("recent_failures") or [])
+    if not failures.empty:
+        st.subheader("Alertas · últimas 24 horas")
+        st.warning("Hay sincronizaciones que necesitan revisión.")
+        st.dataframe(failures, use_container_width=True, hide_index=True)
 
 elif page == "Versiones":
     st.subheader("Versiones por confirmar")
@@ -299,16 +304,16 @@ elif page == "Participantes":
 elif page == "Sincronizaciones":
     st.subheader("Sincronizaciones")
     runs = pd.DataFrame(stats.get("latest_syncs") or [])
-    if runs.empty:
-        st.info("No hay ejecuciones registradas.")
-    else:
+    if not runs.empty:
         st.dataframe(runs, use_container_width=True, hide_index=True)
-        failures = runs[runs["status"] == "failed"] if "status" in runs else pd.DataFrame()
-        if not failures.empty:
-            st.warning("Hay ejecuciones recientes con errores. Revisa el mensaje antes de volver a ejecutar el flujo.")
-            st.dataframe(failures[["provider", "status", "error_message", "started_at"]], use_container_width=True, hide_index=True)
-        else:
-            st.success("Las últimas ejecuciones mostradas no tienen errores.")
+    else:
+        st.info("No hay ejecuciones registradas.")
+    recent_failures = pd.DataFrame(stats.get("recent_failures") or [])
+    if not recent_failures.empty:
+        st.warning("Hay ejecuciones con error durante las últimas 24 horas.")
+        st.dataframe(recent_failures, use_container_width=True, hide_index=True)
+    else:
+        st.success("No se registran fallos en las últimas 24 horas.")
 
 st.divider()
 st.caption("GLOBAL STREAMVERSE · Panel privado. Las acciones administrativas se validan en Supabase; la clave service_role nunca se expone en Streamlit.")
