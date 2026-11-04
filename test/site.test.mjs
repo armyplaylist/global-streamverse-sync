@@ -116,6 +116,7 @@ test("artists verse provides exact-credit rankings, individual history and daily
   assert.match(edge, /kind === "artist"/);
   assert.match(edge, /Invalid artist name/);
   assert.match(edge, /artist=eq\./);
+  assert.match(edge, /exactArtist/);
   assert.match(edge, /Los créditos colaborativos se mantienen juntos/);
   const scriptStart = tracks.indexOf("<script>") + "<script>".length;
   const scriptEnd = tracks.indexOf("</script>", scriptStart);
