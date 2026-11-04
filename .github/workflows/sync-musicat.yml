@@ -65,3 +65,13 @@ jobs:
           MAX_PARTICIPANTS_PER_RUN: "20"
           MUSICAT_SYNC_OVERLAP_MS: "7200000"
         run: npm run sync
+      - name: Sync linked Spotify listening histories
+        env:
+          SUPABASE_URL: https://ylybwiwemlnekclrwwjq.supabase.co
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: |
+          curl --fail-with-body --silent --show-error --max-time 180 \\
+            -X POST "$SUPABASE_URL/functions/v1/spotify-sync" \\
+            -H "apikey: $SUPABASE_SECRET_KEY" \\
+            -H "Content-Type: application/json" \\
+            -d "{}"
