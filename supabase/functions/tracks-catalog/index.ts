@@ -179,7 +179,7 @@ async function loadHistoryDetail(baseUrl: string, serviceKey: string, params: UR
     if (!artist || artist.length > 300 || /[\u0000-\u001f]/.test(artist)) {
       return json({ error: "Invalid artist name" }, 400);
     }
-    const events = await fetchAllEvents(baseUrl, serviceKey, "artist=eq." + encodeURIComponent(artist));
+    const exactArtist = '"' + artist.replace(/\\\\/g, "\\\\\\\\").replace(/"/g, '\\\\"') + '"';\n    const events = await fetchAllEvents(baseUrl, serviceKey, "artist=eq." + encodeURIComponent(exactArtist));
     const summary = historySummary(events);
     const tracks = new Map<string, { track: string; total_streams: number; last_played: string }>();
     for (const event of events) {
