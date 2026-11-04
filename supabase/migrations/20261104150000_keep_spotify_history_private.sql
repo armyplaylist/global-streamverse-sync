@@ -6,7 +6,7 @@ returns jsonb
 language sql
 stable
 security definer
-set search_path to 'public'
+set search_path to ''
 as $function$
 with target as (
   select u.participant_id, u.handle, u.bio, u.avatar_url, u.banner_url,
