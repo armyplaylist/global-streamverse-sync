@@ -35,6 +35,7 @@ jobs:
           node --check scripts/supabase-api.mjs
           node --check scripts/approve-musicat-participants.mjs
           node --check scripts/sync-musicat.mjs
+          node --check src.js
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
       - name: Verify protected secret exists
