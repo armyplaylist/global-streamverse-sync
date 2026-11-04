@@ -145,6 +145,8 @@ test("statistics and catalog pages are read-only without outbound Spotify redire
   assert.doesNotMatch(app, /Versiones por confirmar|Versión por confirmar|candidate_albums/);
   const publicApp = app.slice(0, app.indexOf("function Profile()"));
   assert.doesNotMatch(publicApp, /Abrir en Spotify|spotify-link|spotify-oauth|scrobble_connections/);
+  assert.match(publicApp, /Estadísticas globales/);
+  assert.doesNotMatch(publicApp, /h\("h1",null,"Spotify Streams"\)/);
   assert.doesNotMatch(tracks, /Versiones por confirmar|candidateAlbums|candidateCount|spotify-link|Escuchar en Spotify/);
   assert.doesNotMatch(tracks, /href="https:\/\/open\.spotify\.com/);
   assert.match(tracks, /Registro Musicat/);
