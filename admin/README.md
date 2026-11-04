@@ -16,6 +16,8 @@ SUPABASE_ANON_KEY = "TU_CLAVE_PUBLICA_ANON"
 
 5. Deploy.
 
+Las dependencias del panel están en `admin/requirements.txt`; la raíz del repositorio mantiene únicamente las dependencias de la API Python de Vercel.
+
 La clave anon/publicable es la única clave de Supabase que se configura aquí. **No pegues la service_role ni una secret key**.
 
 ## Seguridad
