@@ -103,3 +103,21 @@ test("tracks catalog edge function validates identifiers and limits history to M
   assert.match(edge, /Invalid album reference/);
   assert.match(edge, /streams_365d/);
 });
+
+test("artists verse provides exact-credit rankings, individual history and daily evolution", () => {
+  const tracks = readFileSync(new URL("../site/tracks.html", import.meta.url), "utf8");
+  const edge = readFileSync(new URL("../supabase/functions/tracks-catalog/index.ts", import.meta.url), "utf8");
+  assert.match(tracks, /data-view="artists"/);
+  assert.match(tracks, /id="artistList"/);
+  assert.match(tracks, /openArtistHistory/);
+  assert.match(tracks, /detail:"artists"/);
+  assert.match(tracks, /detail:"artist"/);
+  assert.match(edge, /kind === "artists"/);
+  assert.match(edge, /kind === "artist"/);
+  assert.match(edge, /Invalid artist name/);
+  assert.match(edge, /artist=eq\./);
+  assert.match(edge, /Los créditos colaborativos se mantienen juntos/);
+  const scriptStart = tracks.indexOf("<script>") + "<script>".length;
+  const scriptEnd = tracks.indexOf("</script>", scriptStart);
+  assert.doesNotThrow(() => new Script(tracks.slice(scriptStart, scriptEnd)), "artists JavaScript should parse");
+});
