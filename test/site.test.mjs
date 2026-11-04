@@ -52,9 +52,8 @@ test("uses the public Supabase key only as an apikey header", () => {
 });
 
 
-test("profile exposes secure Musicat refresh and separates capture, play and record times", () => {
-  assert.match(profile, /id="refresh"/);
-  assert.match(profile, /Actualizar Musicat/);
+test("profile hides editing and manual refresh controls while keeping Musicat statistics", () => {
+  assert.match(profile, /\.twitter-buttons,#profileEditor\{display:none!important\}/);
   assert.match(profile, /musicat_sync_requests/);
   assert.match(profile, /last_capture_at/);
   assert.match(profile, /last_played_at/);
@@ -68,16 +67,13 @@ test("profile exposes secure Musicat refresh and separates capture, play and rec
   assert.doesNotThrow(() => new Script(match[1]), "profile JavaScript should parse");
 });
 
-test("React profile preserves private auth, editable identity, Spotify and scrobble connections", () => {
+test("React profile keeps private auth and Musicat-only read-only statistics", () => {
   const app = readFileSync(new URL("../src.js", import.meta.url), "utf8");
   assert.match(app, /function Profile\(\)/);
   assert.match(app, /identity\(\{\.\.\.person,\.\.\.mine\}\)/);
   assert.match(app, /window\.location\.href="\/#access"/);
-  assert.match(app, /spotify-oauth/);
-  assert.match(app, /Conectar con Spotify/);
-  assert.match(app, /Conectar ListenBrainz/);
-  assert.match(app, /Conectar Last\.fm/);
-  assert.match(app, /musicat_sync_requests/);
+  assert.doesNotMatch(app, /Editar perfil|Actualizar Musicat|Conectar con Spotify|Conectar ListenBrainz|Conectar Last\.fm/);
+  assert.doesNotMatch(app, /className:"profile-spotify"|className:"profile-scrobbles"/);
 });
 
 test("tracks page exposes individual song and album listening history without attributing candidate editions", () => {
@@ -121,4 +117,17 @@ test("artists verse provides exact-credit rankings, individual history and daily
   const scriptStart = tracks.indexOf("<script>") + "<script>".length;
   const scriptEnd = tracks.indexOf("</script>", scriptStart);
   assert.doesNotThrow(() => new Script(tracks.slice(scriptStart, scriptEnd)), "artists JavaScript should parse");
+});
+
+test("statistics and catalog pages are read-only without outbound Spotify redirects or pending editions", () => {
+  const app = readFileSync(new URL("../src.js", import.meta.url), "utf8");
+  const tracks = readFileSync(new URL("../site/tracks.html", import.meta.url), "utf8");
+  assert.doesNotMatch(app, /Versiones por confirmar|Versión por confirmar|candidate_albums/);
+  assert.doesNotMatch(app, /Abrir en Spotify|spotify-link|spotify-oauth|scrobble_connections/);
+  assert.doesNotMatch(tracks, /Versiones por confirmar|candidateAlbums|candidateCount|spotify-link|Escuchar en Spotify/);
+  assert.doesNotMatch(tracks, /href="https:\/\/open\.spotify\.com/);
+  assert.match(tracks, /Registro Musicat/);
+  const scriptStart = tracks.indexOf("<script>") + "<script>".length;
+  const scriptEnd = tracks.indexOf("</script>", scriptStart);
+  assert.doesNotThrow(() => new Script(tracks.slice(scriptStart, scriptEnd)), "clean tracks JavaScript should parse");
 });
