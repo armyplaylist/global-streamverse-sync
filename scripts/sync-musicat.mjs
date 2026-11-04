@@ -171,7 +171,6 @@ async function openMusicatHistory(browser, profileUrl) {
 }
 
 async function importEvents(participant, events, metadataEvents = events) {
-  if (events.length === 0) return 0;
   const payload = events.map(event => ({
     participant_id: participant.id,
     provider: "musicat",
