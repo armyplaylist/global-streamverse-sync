@@ -123,6 +123,13 @@ test("artists verse provides exact-credit rankings, individual history and daily
 });
 
 
+test("Vercel keeps legacy profile pages reachable through internal rewrites", () => {
+  const config = readFileSync(new URL("../vercel.json", import.meta.url), "utf8");
+  assert.match(config, /"source": "\/legacy\/(\.\*)"/);
+  assert.match(config, /"destination": "\/site\/\$1"/);
+  assert.match(config, /"destination": "\/site\/index\.html"/);
+});
+
 test("background sync runs Musicat every ten minutes and keeps other scrobble providers out", () => {
   const workflow = readFileSync(new URL("../.github/workflows/sync-musicat.yml", import.meta.url), "utf8");
   assert.match(workflow, /cron:\s*["']\*\/10 \* \* \* \*["']/);
