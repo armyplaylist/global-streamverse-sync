@@ -9,46 +9,105 @@
 :root{color-scheme:light;--bg:#f7f5fc;--ink:#292238;--muted:#716a80;--line:#e5def1;--violet:#7952c7;--soft:#f1ebfa}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 80% 0%,#e8dcff,transparent 40%),var(--bg);color:var(--ink);font:15px/1.55 Inter,system-ui,sans-serif}.wrap{width:min(100% - 32px,1040px);margin:auto}header{padding:17px 0;border-bottom:1px solid var(--line)}.nav{display:flex;justify-content:space-between;align-items:center;gap:12px}.brand{font-weight:900;letter-spacing:.12em;text-decoration:none;color:var(--ink)}.brand span{color:var(--violet)}.btn{display:inline-flex;padding:9px 13px;border:1px solid #d9cbed;border-radius:11px;background:#f0eafa;color:#513c78;font-weight:800;text-decoration:none;font-size:12px}
 .hero{padding:38px 0 22px}.eyebrow{color:#7952c7;font-size:11px;font-weight:850;letter-spacing:.16em;text-transform:uppercase}.hero h1{font-size:clamp(34px,7vw,54px);line-height:1.02;letter-spacing:-.04em;margin:8px 0}.hero p{max-width:700px;color:var(--muted);margin:8px 0}.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:20px 0}.stat,.toolbar,.song{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 8px 24px #39265d08}.stat{padding:14px}.stat small{display:block;color:var(--muted);font-size:11px}.stat strong{display:block;font-size:25px;margin-top:3px;font-variant-numeric:tabular-nums}.toolbar{padding:14px;margin:18px 0;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.periods{display:flex;gap:7px;flex-wrap:wrap}.period{border:1px solid #ded5ea;background:#f7f4fb;color:#5c526d;border-radius:10px;padding:9px 13px;font-weight:800;cursor:pointer}.period.active{background:#e9defb;border-color:#a98bdb;color:#4e347c}.search{flex:1;min-width:190px;max-width:320px;padding:10px 12px;border:1px solid #d8d0e3;border-radius:10px;font:inherit;color:var(--ink);background:white}.meta{color:var(--muted);font-size:12px;margin:0 0 12px}.songs{display:grid;gap:10px}.song{padding:12px;display:grid;grid-template-columns:76px minmax(0,1fr) auto;gap:14px;align-items:center}.cover{width:76px;height:76px;border-radius:11px;object-fit:cover;background:#f1edf6;border:1px solid #eee8f5}.cover.placeholder{display:grid;place-items:center;color:#9b8ab8;font-size:26px}.song-main{min-width:0}.song-title{font-weight:850;font-size:15px;line-height:1.3}.artist{color:#716a80;font-size:12px;margin-top:3px}.album{color:#8a8298;font-size:11px;margin-top:5px;overflow-wrap:anywhere}.tag{display:inline-block;margin-top:6px;padding:3px 7px;border-radius:7px;background:#f2edf9;color:#6e5597;font-size:10px;font-weight:800}.count{text-align:right;min-width:100px}.count strong{display:block;font-size:22px;font-variant-numeric:tabular-nums}.count small{display:block;color:#8a8298;font-size:10px}.spotify-link{display:inline-flex;align-items:center;gap:5px;color:#247347;text-decoration:none;font-size:10px;font-weight:800;margin-top:5px}.empty{padding:30px;text-align:center;background:#fff;border:1px dashed #d9cbed;border-radius:15px;color:var(--muted)}.foot{margin:26px 0 34px;color:#827991;font-size:11px}.foot a{color:#5f478c}.spotify-mark{width:17px;height:17px;vertical-align:middle}.rank{font-size:11px;color:#9388a3;font-weight:850}.status{font-size:12px;color:var(--muted);margin:12px 2px;min-height:18px}
+.versions{display:grid;gap:6px;margin-top:8px}.version{display:flex;align-items:center;gap:8px;padding:7px;border:1px solid #eee8f5;border-radius:10px;background:#fbfaff}.version img{width:38px;height:38px;border-radius:6px;object-fit:cover}.version a{color:#5f478c;text-decoration:none;font-size:11px;font-weight:800}.version small{display:block;color:#827991;font-size:10px;font-weight:500}.track-details{font-size:10px;color:#8a8298;margin-top:5px;line-height:1.4}.versions-title{font-size:10px;color:#6e5597;font-weight:850;margin-top:8px}.observed-label{font-size:9px;color:#6e5597;line-height:1.25;margin-top:4px}.observed-covers{margin-top:8px}.observed-covers span{display:block;font-size:9px;color:#6e5597;font-weight:800;margin-bottom:4px}.observed-covers>div{display:flex;gap:5px;flex-wrap:wrap}.observed-covers img{width:34px;height:34px;border-radius:6px;object-fit:cover;border:1px solid #eee8f5}
+
+.view-tabs{display:flex;gap:8px;margin:18px 0 12px}.view-tab{border:1px solid #ded5ea;background:#fff;color:#5c526d;border-radius:11px;padding:10px 16px;font-weight:850;cursor:pointer}.view-tab.active{background:#e9defb;border-color:#a98bdb;color:#4e347c}
+.album-section{display:grid;gap:18px}.album-section h2{font-size:18px;margin:4px 0 2px}.album-section p{color:#81778f;font-size:12px;margin:0 0 8px}.album-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}.album-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px;box-shadow:0 8px 24px #39265d08;display:grid;grid-template-columns:82px minmax(0,1fr);gap:12px;align-items:start}.album-cover{width:82px;height:82px;object-fit:cover;border-radius:11px;background:#f1edf6;border:1px solid #eee8f5}.album-title{font-size:14px;font-weight:900;line-height:1.25}.album-sub{font-size:11px;color:#81778f;margin-top:4px}.album-tracklist{font-size:10px;color:#6f667e;margin-top:7px;line-height:1.45}.album-badge{display:inline-block;margin-top:7px;padding:4px 7px;border-radius:7px;background:#f2edf9;color:#6e5597;font-size:9px;font-weight:850}.album-empty{grid-column:1/-1}.album-card.candidate{border-style:dashed;background:#fdfcff}
+@media(max-width:600px){.album-grid{grid-template-columns:1fr}.album-card{grid-template-columns:72px minmax(0,1fr)}.album-cover{width:72px;height:72px}.view-tabs{margin-top:14px}}
+
 @media(max-width:600px){.summary{gap:7px}.stat{padding:11px 9px}.stat strong{font-size:20px}.song{grid-template-columns:64px minmax(0,1fr) auto;gap:10px;padding:10px}.cover{width:64px;height:64px}.count{min-width:74px}.count strong{font-size:18px}.count small{font-size:9px}.toolbar{align-items:stretch}.search{max-width:none;width:100%}}
-</style>
+.bottom-dock{position:fixed;z-index:50;left:50%;bottom:max(12px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(540px,calc(100% - 28px));display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:8px;background:rgba(255,255,255,.94);border:1px solid #e6def0;border-radius:22px;box-shadow:0 12px 38px #30234220;backdrop-filter:blur(18px)}.dock-link{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:48px;color:#81778f;text-decoration:none;font-size:10px;font-weight:750;border-radius:14px}.dock-link svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.dock-link.active,.dock-link:hover{color:#7952c7;background:#f1eafa}body{padding-bottom:100px}html{scroll-padding-top:24px}@media(min-width:760px){.bottom-dock{bottom:18px}}</style>
 </head>
 <body>
 <header><div class="wrap nav"><a class="brand" href="/">GLOBAL <span>STREAMVERSE</span></a><a class="btn" href="/">Volver al inicio</a></div></header>
 <main class="wrap">
 <section class="hero"><div class="eyebrow">Global song charts</div><h1>TRACKS <span style="color:#7952c7">VERSE</span></h1><p>Un recuento colectivo de las canciones registradas por GLOBAL STREAMVERSE. Cada reproducción procede del historial de Musicat de los participantes; Spotify aporta la información musical y las portadas.</p></section>
 <section class="summary"><article class="stat"><small>Reproducciones registradas</small><strong id="total">—</strong></article><article class="stat"><small>Canciones identificadas</small><strong id="identified">—</strong></article><article class="stat"><small>Canciones en catálogo</small><strong id="songsCount">—</strong></article></section>
+<div class="view-tabs" role="group" aria-label="Tipo de catálogo"><button class="view-tab active" data-view="tracks">Canciones</button><button class="view-tab" data-view="albums">Álbumes</button></div>
 <section class="toolbar"><div class="periods" role="group" aria-label="Periodo"><button class="period active" data-period="total">Total</button><button class="period" data-period="today">Hoy</button><button class="period" data-period="week">7 días</button><button class="period" data-period="month">Mes</button></div><input class="search" id="search" type="search" placeholder="Buscar canción o artista…" aria-label="Buscar canción o artista"></section>
 <p class="meta" id="meta">Cargando recuento global…</p>
 <section class="songs" id="songs"><div class="empty">Preparando el catálogo de canciones…</div></section>
+<section class="album-section" id="albums" hidden><div><h2>Álbumes del catálogo</h2><p>Una sola portada por lanzamiento. Las asociaciones provienen del catálogo de Spotify y no confirman por sí solas qué edición se reprodujo.</p><div class="album-grid" id="confirmedAlbums"></div></div><div><h2>Versiones por confirmar</h2><p>Incluye lanzamientos candidatos de canciones con más de una coincidencia. No se les asignan reproducciones hasta identificar la edición correcta.</p><div class="album-grid" id="candidateAlbums"></div></div></section>
 <p class="status" id="status" aria-live="polite"></p>
 <p class="foot">Las portadas, los nombres de álbumes y los enlaces de catálogo se atribuyen a <a href="https://www.spotify.com/" target="_blank" rel="noopener">Spotify</a>. Las imágenes se muestran en su formato original y enlazan al contenido correspondiente. GLOBAL STREAMVERSE es un proyecto independiente de fans, no afiliado a Spotify, BTS ni HYBE. Los recuentos reflejan únicamente las reproducciones que Musicat hizo disponibles y que GLOBAL STREAMVERSE pudo registrar.</p>
-</main>
+</main><nav class="bottom-dock" aria-label="Navegación principal">
+<a class="dock-link" href="/" aria-label="Inicio"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg><span>Inicio</span></a>
+<a class="dock-link active" href="/tracks.html" aria-label="Canciones"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg><span>Canciones</span></a>
+<a class="dock-link" href="/#ranking" aria-label="Ranking"><svg viewBox="0 0 24 24"><path d="M4 19V9m8 10V4m8 15v-7"/></svg><span>Ranking</span></a>
+<a class="dock-link" href="/profile.html" aria-label="Mi perfil"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>Perfil</span></a>
+</nav>
 <script>
 const SUPABASE_URL="https://ylybwiwemlnekclrwwjq.supabase.co";
 const SUPABASE_KEY="sb_publishable_CLbbu_GKYbH5sRB9R-EsSg_r3-jL9BN";
 const endpoint=SUPABASE_URL+"/functions/v1/tracks-catalog";
-let allRows=[],period="total";
+let allRows=[],period="total",activeView="tracks";
 const fmt=n=>(Number(n)||0).toLocaleString("en-US");
 const esc=s=>String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function releaseType(value){return value==="album"?"Álbum":value==="single"?"Single":value==="compilation"?"Compilación":value||"Lanzamiento"}
+function duration(value){const ms=Number(value);if(!Number.isFinite(ms)||ms<=0)return "";const seconds=Math.floor(ms/1000);return Math.floor(seconds/60)+":"+String(seconds%60).padStart(2,"0")}
 function countFor(r){return Number(r[period==="today"?"today_streams":period==="week"?"week_streams":period==="month"?"month_streams":"total_streams"])||0;}
 function spotifyIcon(){return '<svg class="spotify-mark" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#1ed760"/><path d="M5.2 9.2c4.7-1.4 9.9-.9 13.6 1.4M6.1 12.3c3.9-1.1 8.3-.7 11.4 1.2M7 15.2c3.1-.8 6.4-.5 8.9.9" fill="none" stroke="#102b1b" stroke-width="1.7" stroke-linecap="round"/></svg>';}
+function observedCovers(row){return Array.isArray(row.used_album_covers)?[...new Set(row.used_album_covers.filter(url=>typeof url==="string"&&/^https:\/\//i.test(url)))]:[];}
+function renderTracks(rows){
+ const box=document.getElementById("songs");
+ if(!rows.length){box.innerHTML='<div class="empty">No encontramos canciones con ese nombre o todavía no hay reproducciones registradas en este periodo.</div>';return;}
+ box.innerHTML=rows.map((r,i)=>{
+  const covers=observedCovers(r);
+  const cover=covers.length?'<img class="cover" src="'+esc(covers[0])+'" alt="Portada observada en Musicat" loading="lazy">':r.match_status==="matched"&&r.album_image_url?'<a href="'+esc(r.spotify_track_url||"https://open.spotify.com/")+'" target="_blank" rel="noopener"><img class="cover" src="'+esc(r.album_image_url)+'" alt="Portada de referencia de Spotify; edición reproducida no confirmada" loading="lazy"></a>':'<div class="cover placeholder">♫</div>';
+  const usedAlbums=Array.isArray(r.used_albums)?r.used_albums.filter(Boolean):[];
+  const album=usedAlbums.length?"Ediciones identificadas: "+usedAlbums.map(esc).join(" · "):covers.length?"Portada observada en Musicat · nombre de edición no disponible":r.match_status==="matched"?"Referencia del catálogo: "+esc(r.album_name||"álbum no indicado"):"Edición no disponible en el historial público de Musicat";
+  const details=r.match_status==="matched"?[r.track_number&&r.album_total_tracks?"Pista "+r.track_number+"/"+r.album_total_tracks:"",r.disc_number&&r.disc_number>1?"Disco "+r.disc_number:"",duration(r.duration_ms)?"Duración "+duration(r.duration_ms):"",r.isrc?"ISRC "+r.isrc:""].filter(Boolean).join(" · "):"";
+  const link=r.match_status==="matched"&&r.spotify_track_url?'<a class="spotify-link" href="'+esc(r.spotify_track_url)+'" target="_blank" rel="noopener">'+spotifyIcon()+' Escuchar en Spotify</a>':"";
+  const tag=r.match_status==="matched"?"Spotify verificado":r.match_status==="ambiguous"?"Versión por confirmar":"Catálogo pendiente";
+  const coverNote=covers.length?'<div class="observed-label">Portada observada en el historial de Musicat</div>':r.match_status==="matched"&&r.album_image_url?'<div class="observed-label">Portada de referencia de Spotify · no confirma la edición escuchada</div>':"";
+  return '<article class="song">'+cover+'<div class="song-main"><div class="rank">#'+(i+1)+'</div><div class="song-title">'+esc(r.track_name)+'</div><div class="artist">'+esc(r.artist_name)+'</div><div class="album">'+album+'</div>'+(details?'<div class="track-details">'+esc(details)+'</div>':"")+coverNote+'<span class="tag">'+tag+'</span><br>'+link+'</div><div class="count"><strong>'+fmt(countFor(r))+'</strong><small>reproducciones</small></div></article>';
+ }).join("");
+}
+function albumCard(album,candidate=false){
+ const tracks=[...new Set(album.tracks||[])];
+ const image=album.image?'<img class="album-cover" src="'+esc(album.image)+'" alt="Portada de '+esc(album.name)+'" loading="lazy">':'<div class="album-cover placeholder">♫</div>';
+ const trackText=tracks.length?tracks.map(esc).join(" · "):"Sin canciones relacionadas";
+ const badge=candidate?"Candidato · edición por confirmar":"Asociación del catálogo Spotify";
+ const note=candidate?"No se asignan reproducciones a esta edición hasta confirmar cuál se escuchó.":"La portada identifica el lanzamiento del catálogo; no confirma que todas las reproducciones de estas canciones provengan de esta edición.";
+ return '<article class="album-card'+(candidate?' candidate':'')+'">'+image+'<div><div class="album-title">'+esc(album.name)+'</div><div class="album-sub">'+releaseType(album.type)+(album.releaseDate?" · "+esc(album.releaseDate):"")+'</div><div class="album-tracklist"><strong>Canciones relacionadas:</strong> '+trackText+'</div><span class="album-badge">'+badge+'</span><div class="album-sub">'+note+'</div></div></article>';
+}
+function buildAlbums(term){
+ const confirmed=new Map(),candidates=new Map();
+ for(const row of allRows){
+  if(row.match_status==="matched"&&row.album_name&&row.album_image_url){
+   const key=row.album_uri||("name:"+String(row.album_name).toLowerCase());
+   if(!confirmed.has(key))confirmed.set(key,{name:row.album_name,image:row.album_image_url,uri:row.album_uri,type:row.album_type,releaseDate:row.album_release_date,tracks:[]});
+   confirmed.get(key).tracks.push(row.track_name);
+  }
+  if(row.match_status==="ambiguous"&&Array.isArray(row.spotify_candidates)){
+   for(const item of row.spotify_candidates){
+    if(!item.album_name||!item.album_image_url)continue;
+    const key=item.album_uri||("name:"+String(item.album_name).toLowerCase());
+    if(confirmed.has(key)){confirmed.get(key).tracks.push(row.track_name+" · por confirmar");continue;}
+    if(!candidates.has(key))candidates.set(key,{name:item.album_name,image:item.album_image_url,uri:item.album_uri,type:item.album_type,releaseDate:item.album_release_date,tracks:[]});
+    candidates.get(key).tracks.push(row.track_name);
+   }
+  }
+ }
+ const matches=a=>(a.name+" "+(a.tracks||[]).join(" ")).toLowerCase().includes(term);
+ const known=[...confirmed.values()].filter(matches).sort((a,b)=>a.name.localeCompare(b.name));
+ const possible=[...candidates.values()].filter(matches).sort((a,b)=>a.name.localeCompare(b.name));
+ document.getElementById("confirmedAlbums").innerHTML=known.length?known.map(a=>albumCard(a,false)).join(""):'<div class="empty album-empty">Todavía no hay álbumes con coincidencia única en el catálogo.</div>';
+ document.getElementById("candidateAlbums").innerHTML=possible.length?possible.map(a=>albumCard(a,true)).join(""):'<div class="empty album-empty">No hay versiones candidatas pendientes con esta búsqueda.</div>';
+}
 function render(){
  const term=document.getElementById("search").value.trim().toLowerCase();
- const rows=allRows.filter(r=>(String(r.track_name)+" "+String(r.artist_name)+" "+String(r.album_name||"")).toLowerCase().includes(term)).sort((a,b)=>countFor(b)-countFor(a));
+ const rows=allRows.filter(r=>(String(r.track_name)+" "+String(r.artist_name)+" "+String(r.album_name||"")+" "+(Array.isArray(r.used_albums)?r.used_albums.join(" "):"")).toLowerCase().includes(term)).sort((a,b)=>countFor(b)-countFor(a));
  const total=allRows.reduce((s,r)=>s+Number(r.total_streams||0),0);
  document.getElementById("total").textContent=fmt(total);
  document.getElementById("identified").textContent=fmt(allRows.filter(r=>r.match_status==="matched").length);
  document.getElementById("songsCount").textContent=fmt(allRows.length);
- document.getElementById("meta").textContent=rows.length+" canciones · ordenadas por reproducciones "+(period==="total"?"acumuladas":period==="today"?"de hoy":period==="week"?"de los últimos 7 días":"del mes")+" · reinicio diario 00:00 UTC.";
- const box=document.getElementById("songs");
- if(!rows.length){box.innerHTML='<div class="empty">No encontramos canciones con ese nombre o todavía no hay reproducciones registradas en este periodo.</div>';return;}
- box.innerHTML=rows.map((r,i)=>{
-  const cover=r.match_status==="matched"&&r.album_image_url?'<a href="'+esc(r.spotify_track_url||"https://open.spotify.com/")+'" target="_blank" rel="noopener"><img class="cover" src="'+esc(r.album_image_url)+'" alt="Portada de '+esc(r.album_name||r.track_name)+'" loading="lazy"></a>':'<div class="cover placeholder">♫</div>';
-  const album=r.match_status==="matched"?(esc(r.album_name||"Álbum no indicado")+" · "+esc(r.album_type||"release")+(r.album_release_date?" · "+esc(r.album_release_date):"")):r.match_status==="ambiguous"?"Hay varias versiones posibles; identificación pendiente":"Metadatos de Spotify pendientes";
-  const link=r.match_status==="matched"&&r.spotify_track_url?'<a class="spotify-link" href="'+esc(r.spotify_track_url)+'" target="_blank" rel="noopener">'+spotifyIcon()+' Escuchar en Spotify</a>':"";
-  const tag=r.match_status==="matched"?"Spotify verificado":r.match_status==="ambiguous"?"Versión por confirmar":"Catálogo pendiente";
-  return '<article class="song">'+cover+'<div class="song-main"><div class="rank">#'+(i+1)+'</div><div class="song-title">'+esc(r.track_name)+'</div><div class="artist">'+esc(r.artist_name)+'</div><div class="album">'+album+'</div><span class="tag">'+tag+'</span><br>'+link+'</div><div class="count"><strong>'+fmt(countFor(r))+'</strong><small>reproducciones</small></div></article>';
- }).join("");
+ const periodText=period==="total"?"acumuladas":period==="today"?"de hoy":period==="week"?"de los últimos 7 días":"del mes";
+ document.getElementById("meta").textContent=activeView==="tracks"?rows.length+" canciones · ordenadas por reproducciones "+periodText+" · reinicio diario 00:00 UTC.": "Catálogo de álbumes y versiones · una portada por lanzamiento · sin atribuir streams a ediciones no confirmadas.";
+ document.getElementById("songs").hidden=activeView!=="tracks";
+ document.getElementById("albums").hidden=activeView!=="albums";
+ document.querySelector(".periods").style.display=activeView==="tracks"?"flex":"none";
+ if(activeView==="tracks")renderTracks(rows);else buildAlbums(term);
 }
 async function load(){
  const status=document.getElementById("status");
@@ -57,7 +116,7 @@ async function load(){
   const data=await response.json();
   if(!response.ok)throw new Error(data.error||"No se pudo cargar el catálogo.");
   allRows=Array.isArray(data.rows)?data.rows:[];
-  if(!data.spotify_configured)status.textContent="El recuento está disponible. Falta completar la conexión segura de Spotify para cargar las portadas y los álbumes.";
+  if(!data.spotify_configured)status.textContent=data.spotify_client_id_configured?"El Client ID de Spotify está listo. Falta guardar SPOTIFY_CLIENT_SECRET en Supabase → Edge Functions → Secrets para cargar portadas, álbumes y versiones. No lo compartas en el chat ni en el navegador.":"Falta completar la conexión segura de Spotify para cargar portadas y versiones.";
   else if(data.spotify_error)status.textContent="El catálogo está cargado; Spotify informó: "+data.spotify_error;
   else if(data.enriched_this_request)status.textContent="Actualizamos metadatos de Spotify para "+data.enriched_this_request+" canciones. Las demás se procesarán gradualmente.";
   else status.textContent="Catálogo actualizado · "+new Date(data.generated_at).toLocaleString();
@@ -65,6 +124,7 @@ async function load(){
  }catch(error){status.textContent=error.message||"No pudimos conectar con el catálogo.";document.getElementById("songs").innerHTML='<div class="empty">El recuento global no está disponible temporalmente. Intenta de nuevo en unos minutos.</div>';}
 }
 document.querySelectorAll(".period").forEach(button=>button.addEventListener("click",()=>{period=button.dataset.period;document.querySelectorAll(".period").forEach(b=>b.classList.toggle("active",b===button));render();}));
+document.querySelectorAll(".view-tab").forEach(button=>button.addEventListener("click",()=>{activeView=button.dataset.view;document.querySelectorAll(".view-tab").forEach(b=>b.classList.toggle("active",b===button));render();}));
 document.getElementById("search").addEventListener("input",render);
 load();setInterval(load,5*60*1000);
 </script>
