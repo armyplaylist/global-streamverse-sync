@@ -23,7 +23,7 @@ export function extractMusicatUserId(hrefs) {
   return null;
 }
 
-export async function waitForMusicatUserId(page, timeoutMs = 15000) {
+export async function waitForMusicatUserId(page, timeoutMs = 25000) {
   const timeout = Number.isInteger(timeoutMs)
     ? Math.max(1000, Math.min(timeoutMs, 30000))
     : 15000;
