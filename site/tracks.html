@@ -159,6 +159,7 @@ function render(){
  document.getElementById("songsCount").textContent=fmt(allRows.length);
  document.getElementById("meta").textContent=activeView==="tracks"?rows.length+" canciones":"";
  document.getElementById("songs").hidden=activeView!=="tracks";
+ document.getElementById("trackDetail").hidden=true;
  document.getElementById("albums").hidden=activeView!=="albums";document.getElementById("albumDetail").hidden=true;
  document.querySelector(".periods").style.display=activeView==="tracks"?"flex":"none";
  if(activeView==="tracks")renderTracks(rows);else buildAlbums(term);
