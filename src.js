@@ -62,7 +62,7 @@ function Tracks(){
     }
    }
   }
-  return {known:[...known.values()].sort((a,b)=>b.total-a.total||a.name.localeCompare(b.name)),possible:[...possible.values()].sort((a,b)=>a.name.localeCompare(b.name))};
+  return {known:[...known.values()].sort((a,b)=>b.total-a.total||a.name.localeCompare(b.name)),possible:[...possible.values()].filter(a=>!known.has(a.key)).sort((a,b)=>a.name.localeCompare(b.name))};
  },[rows]);
  const term=query.trim().toLocaleLowerCase();
  const visibleRows=rows.filter(r=>([r.track_name,r.artist_name,r.album_name,...(r.used_albums||[])].join(" ").toLocaleLowerCase().includes(term))).sort((a,b)=>{
