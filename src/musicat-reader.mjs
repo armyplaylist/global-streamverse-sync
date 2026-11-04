@@ -135,6 +135,9 @@ export async function collectMusicatHistorySince(page, since, options = {}) {
   const waitForRowsMs = Number.isInteger(options.waitForRowsMs)
     ? Math.max(1000, options.waitForRowsMs)
     : 12000;
+  const metadataScrollBatches = Number.isInteger(options.metadataScrollBatches)
+    ? Math.max(0, options.metadataScrollBatches)
+    : 0;
 
   await page.waitForSelector("time[datetime]", { timeout: 20000 });
   await page.waitForTimeout(1200);
@@ -228,11 +231,11 @@ export async function collectMusicatHistorySince(page, since, options = {}) {
 
     for (const row of rows) unique.set(musicatDedupeKey(row), row);
 
-    if (Date.parse(oldestLoaded) <= cutoff) {
-      reachedCutoff = true;
-      break;
-    }
+    if (Date.parse(oldestLoaded) <= cutoff) reachedCutoff = true;
     if (scrollBatches >= maxScrollBatches) break;
+    // Even after the incremental cutoff is reached, keep loading a small
+    // recent-history window so existing events can receive their real artwork.
+    if (reachedCutoff && scrollBatches >= metadataScrollBatches) break;
 
     const previousCount = await page.locator("time[datetime]").count();
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
@@ -253,9 +256,11 @@ export async function collectMusicatHistorySince(page, since, options = {}) {
     }
   }
 
-  const events = filterMusicatRowsSince([...unique.values()], since);
+  const visibleEvents = [...unique.values()];
+  const events = filterMusicatRowsSince(visibleEvents, since);
   return {
     events,
+    visibleEvents,
     visibleUniqueRows: unique.size,
     scrollBatches,
     reachedCutoff,
