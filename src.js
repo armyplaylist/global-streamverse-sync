@@ -237,7 +237,7 @@ function Profile(){
    h("section",{className:"profile-history"},h("div",{className:"profile-history-head"},h("h2",null,publicView?"Historial público · últimas 50 escuchas":"Historial reciente · últimas 50 escuchas"),h("span",null,publicView?"Datos públicos":"Musicat")),events.length?h("div",{className:"profile-events"},events.map((e,i)=>h("article",{className:"profile-event",key:(e.played_at||"")+i},h("div",null,h("b",null,e.track||"Canción desconocida"),h("small",null,e.artist||"Artista desconocido"),h("small",null,(e.source||"Musicat").toUpperCase()+(e.album?" · "+e.album:""),!publicView&&e.recorded_at?" · Guardada: "+localTime(e.recorded_at):"")),h("time",null,localTime(e.played_at||e.recorded_at))))):h("div",{className:"profile-empty"},publicView?"Este perfil todavía no tiene escuchas públicas.":"Todavía no hay reproducciones registradas. Cuando Musicat sincronice tu historial, aparecerán aquí.")),
    h("p",{className:"profile-status"},status),
    h("p",{className:"profile-disclaimer"},"GLOBAL STREAMVERSE es un proyecto independiente de fans. Las reproducciones mostradas corresponden a los datos disponibles y sincronizados; no representan el historial completo de Spotify.")
-  )),
+  ),
   h("nav",{className:"profile-dock"},[["/","⌂","Inicio"],["/tracks.html","♫","Canciones"],["/#ranking","▥","Ranking"],["/profile.html","◎","Perfil"]].map(([url,ic,label])=>h("a",{href:url,className:label==="Perfil"?"active":"" ,key:label},h("span",null,ic),label)))
  );
 }
