@@ -157,11 +157,12 @@ export async function collectMusicatHistorySince(page, since, options = {}) {
         '[class*="PlayedMusic_album"], [class*="album" i], [data-testid*="album" i], [data-album-name], [data-album-title]'
       );
       const albumLabelNode = row.querySelector('[aria-label*="album" i], [title*="album" i]');
-      const albumImage = [...row.querySelectorAll("img")].find(img => {
+      const rowImages = [...row.querySelectorAll("img")];
+      const albumImage = rowImages.find(img => {
         const description = [img.getAttribute("alt"), img.getAttribute("class"), img.getAttribute("data-testid")]
           .filter(Boolean).join(" ");
         return /album|cover|artwork|playedmusic/i.test(description);
-      });
+      }) || (rowImages.length === 1 ? rowImages[0] : null);
       const album = [
         albumLink?.innerText?.trim(),
         albumLink?.getAttribute("aria-label")?.trim(),
