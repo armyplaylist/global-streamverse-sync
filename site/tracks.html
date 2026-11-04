@@ -30,8 +30,11 @@
 <p class="meta" id="meta">Cargando recuento global…</p>
 <section class="songs" id="songs"><div class="empty">Preparando el catálogo de canciones…</div></section>
 <section id="trackDetail" hidden></section>
-<section id="albumDetail" hidden></section>\n<section id="artists" class="album-section" hidden><div><h2>Artists Verse</h2><p>Ranking de artistas según los créditos exactos de Musicat. Las colaboraciones permanecen agrupadas.</p><div class="artist-list" id="artistList"><div class="detail-loading">Cargando ranking de artistas…</div></div></div></section>\n<section id="artistDetail" hidden></section>
-<section class="album-section" id="albums" hidden><div><h2>Álbumes del catálogo</h2><div class="album-grid" id="confirmedAlbums"></div></div><div><h2>Versiones por confirmar <span id="candidateCount" class="album-badge">0</span></h2><div class="album-grid" id="candidateAlbums"></div></div></section>\n
+<section id="albumDetail" hidden></section>
+<section id="artists" class="album-section" hidden><div><h2>Artists Verse</h2><p>Ranking de artistas según los créditos exactos de Musicat. Las colaboraciones permanecen agrupadas.</p><div class="artist-list" id="artistList"><div class="detail-loading">Cargando ranking de artistas…</div></div></div></section>
+<section id="artistDetail" hidden></section>
+<section class="album-section" id="albums" hidden><div><h2>Álbumes del catálogo</h2><div class="album-grid" id="confirmedAlbums"></div></div><div><h2>Versiones por confirmar <span id="candidateCount" class="album-badge">0</span></h2><div class="album-grid" id="candidateAlbums"></div></div></section>
+
 <p class="status" id="status" aria-live="polite"></p>
 <p class="foot">Reproducciones: Musicat · Portadas y metadatos: Spotify.</p>
 </main><nav class="bottom-dock" aria-label="Navegación principal">
@@ -191,10 +194,14 @@ function render(){
  document.getElementById("songsCount").textContent=fmt(allRows.length);
  document.getElementById("meta").textContent=activeView==="tracks"?rows.length+" canciones":"";
  document.getElementById("songs").hidden=activeView!=="tracks";
- document.getElementById("trackDetail").hidden=true;\n document.getElementById("artistDetail").hidden=true;
- document.getElementById("albums").hidden=activeView!=="albums";document.getElementById("albumDetail").hidden=true;\n document.getElementById("artists").hidden=activeView!=="artists";\n document.querySelector(".toolbar").hidden=activeView==="artists";\n if(activeView==="artists")loadArtists();
+ document.getElementById("trackDetail").hidden=true;
+ document.getElementById("artistDetail").hidden=true;
+ document.getElementById("albums").hidden=activeView!=="albums";document.getElementById("albumDetail").hidden=true;
+ document.getElementById("artists").hidden=activeView!=="artists";
+ document.querySelector(".toolbar").hidden=activeView==="artists";
+ if(activeView==="artists")loadArtists();
  document.querySelector(".periods").style.display=activeView==="tracks"?"flex":"none";
- if(activeView==="tracks")renderTracks(rows);else buildAlbums(term);
+ if(activeView==="tracks")renderTracks(rows);else if(activeView==="albums")buildAlbums(term);
 }
 async function load(){
  const status=document.getElementById("status");
