@@ -179,6 +179,7 @@ async function importEvents(participant, events) {
     artist: event.artist,
     track: event.title,
     album: event.album || null,
+    album_cover_url: event.albumCoverUrl || null,
     played_at: event.playedAt
   }));
 
@@ -204,7 +205,10 @@ async function importEvents(participant, events) {
       {
         method: "PATCH",
         prefer: "return=minimal",
-        body: { album: event.album }
+        body: {
+          album: event.album,
+          ...(event.albumCoverUrl ? { album_cover_url: event.albumCoverUrl } : {})
+        }
       }
     );
   }
