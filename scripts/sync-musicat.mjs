@@ -170,7 +170,7 @@ async function openMusicatHistory(browser, profileUrl) {
   }
 }
 
-async function importEvents(participant, events) {
+async function importEvents(participant, events, metadataEvents = events) {
   if (events.length === 0) return 0;
   const payload = events.map(event => ({
     participant_id: participant.id,
@@ -197,8 +197,8 @@ async function importEvents(participant, events) {
 
   // Backfill album labels on overlapping history rows without erasing a label
   // already captured when Musicat omits album metadata on another render.
-  for (const event of events) {
-    if (!event.album) continue;
+  for (const event of metadataEvents) {
+    if (!event.album && !event.albumCoverUrl) continue;
     await supabaseRequest(
       "stream_events?participant_id=eq." + encodeURIComponent(participant.id)
         + "&dedupe_key=eq." + encodeURIComponent(musicatDedupeKey(event)),
@@ -206,7 +206,7 @@ async function importEvents(participant, events) {
         method: "PATCH",
         prefer: "return=minimal",
         body: {
-          album: event.album,
+          ...(event.album ? { album: event.album } : {}),
           ...(event.albumCoverUrl ? { album_cover_url: event.albumCoverUrl } : {})
         }
       }
@@ -245,7 +245,8 @@ async function syncParticipant(browser, participant) {
     const opened = await openMusicatHistory(browser, participant.public_profile_url);
     page = opened.page;
     const result = await collectMusicatHistorySince(page, cutoff, {
-      maxScrollBatches: MAX_SCROLL_BATCHES
+      maxScrollBatches: MAX_SCROLL_BATCHES,
+      metadataScrollBatches: 3
     });
 
     // During a multi-run initial backfill, older pages can contain rows from
@@ -253,7 +254,10 @@ async function syncParticipant(browser, participant) {
     const eligibleEvents = isInitialBackfill
       ? result.events.filter(event => Date.parse(event.playedAt) >= createdAt)
       : result.events;
-    importedCount = await importEvents(participant, eligibleEvents);
+    const eligibleMetadataEvents = result.visibleEvents.filter(
+      event => Date.parse(event.playedAt) >= createdAt
+    );
+    importedCount = await importEvents(participant, eligibleEvents, eligibleMetadataEvents);
 
     const reachedRegistrationCutoff = hasReachedMusicatIntegrationCutoff(
       result.oldestLoaded,
