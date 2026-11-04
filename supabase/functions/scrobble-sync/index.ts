@@ -1,0 +1,1 @@
+// This source is deployed to Supabase as the scrobble-sync Edge Function.\n// See deployment source attached in the Supabase function deployment history.\n
