@@ -67,6 +67,7 @@ export function normalizeMusicatRows(rows) {
     const playedAt = String(row?.playedAt || "").trim();
     const source = String(row?.source || "").trim();
     const album = String(row?.album || "").trim();
+    const albumCoverUrl = String(row?.albumCoverUrl || "").trim();
     const timestamp = Date.parse(playedAt);
     if (!trackId || !title || !artist || !source || !Number.isFinite(timestamp)) continue;
     normalized.push({
@@ -75,7 +76,8 @@ export function normalizeMusicatRows(rows) {
       artist,
       playedAt: new Date(timestamp).toISOString(),
       source,
-      album: album || null
+      album: album || null,
+      albumCoverUrl: /^https:\/\//i.test(albumCoverUrl) ? albumCoverUrl : null
     });
   }
   return normalized;
@@ -155,9 +157,10 @@ export async function collectMusicatHistorySince(page, since, options = {}) {
         '[class*="PlayedMusic_album"], [class*="album" i], [data-testid*="album" i], [data-album-name], [data-album-title]'
       );
       const albumLabelNode = row.querySelector('[aria-label*="album" i], [title*="album" i]');
-      const albumImage = [...row.querySelectorAll("img[alt]")].find(img => {
-        const alt = (img.getAttribute("alt") || "").trim();
-        return alt && !/^(album|album art|album cover|cover|artwork)$/i.test(alt);
+      const albumImage = [...row.querySelectorAll("img")].find(img => {
+        const description = [img.getAttribute("alt"), img.getAttribute("class"), img.getAttribute("data-testid")]
+          .filter(Boolean).join(" ");
+        return /album|cover|artwork|playedmusic/i.test(description);
       });
       const album = [
         albumLink?.innerText?.trim(),
@@ -169,8 +172,8 @@ export async function collectMusicatHistorySince(page, since, options = {}) {
         albumNode?.innerText?.trim(),
         albumLabelNode?.getAttribute("aria-label")?.trim(),
         albumLabelNode?.getAttribute("title")?.trim(),
-        albumImage?.getAttribute("alt")?.trim()
       ].find(value => value && !/^(album|album art|album cover|cover|artwork)$/i.test(value)) || "";
+      const albumCoverUrl = albumImage?.currentSrc || albumImage?.src || "";
       const trackHref = titleLink?.getAttribute("href")
         || row.querySelector('a[href^="/tracks/"]')?.getAttribute("href")
         || "";
@@ -182,7 +185,8 @@ export async function collectMusicatHistorySince(page, since, options = {}) {
         artist: artistNode?.innerText?.trim() || "",
         playedAt: time.getAttribute("datetime") || "",
         source: sourceNode?.innerText?.trim() || "",
-        album
+        album,
+        albumCoverUrl
       };
     }).filter(Boolean);
   });
