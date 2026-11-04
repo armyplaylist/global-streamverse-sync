@@ -8,34 +8,59 @@ const safeUrl=v=>{try{const u=new URL(v);return u.protocol==="https:"?u.href:""}
 const releaseType=v=>v==="album"?"Álbum":v==="single"?"Single":v==="compilation"?"Compilación":v||"Lanzamiento";
 const duration=v=>{const ms=Number(v);if(!Number.isFinite(ms)||ms<=0)return"";const s=Math.floor(ms/1000);return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")};
 function Analytics(){
- const[data,setData]=useState(null),[catalog,setCatalog]=useState(null),[error,setError]=useState(""),[loading,setLoading]=useState(true);
+ const[data,setData]=useState(null),[catalog,setCatalog]=useState(null),[error,setError]=useState(""),[loading,setLoading]=useState(true),[tab,setTab]=useState("overview"),[period,setPeriod]=useState("today"),[query,setQuery]=useState("");
  useEffect(()=>{let live=true;setLoading(true);setError("");Promise.all([
   fetch("/api/analytics").then(async r=>{if(!r.ok)throw Error("No se pudieron cargar las estadísticas comunitarias.");return r.json()}),
-  fetch("/api/catalog").then(async r=>{if(!r.ok)throw Error("No se pudo cargar el ranking de canciones y álbumes.");return r.json()})
+  fetch("/api/catalog").then(async r=>{if(!r.ok)throw Error("No se pudo cargar el catálogo de reproducciones.");return r.json()})
  ]).then(([a,c])=>{if(live){setData(a);setCatalog(c)}}).catch(e=>{if(live)setError(e.message||"Error de conexión")}).finally(()=>{if(live)setLoading(false)});
  return()=>{live=false}},[]);
- const s=data?.summary||{},cs=catalog?.python_analytics?.summary||{},ca=catalog?.python_analytics||{};
- const row=(name,sub,value,i)=>h("div",{className:"item",key:name+"-"+i},h("b",{className:"position"},i+1),h("div",{className:"item-main"},h("strong",null,name),h("small",null,sub||"")),h("b",{className:"value"},value==="—"?"—":fmt(value)));
+ const summary=data?.summary||{},catalogSummary=catalog?.python_analytics?.summary||{},rows=(catalog?.rows||[]).filter(r=>r.match_status==="matched");
+ const field=period==="today"?"today_streams":period==="week"?"week_streams":period==="month"?"month_streams":"total_streams";
+ const term=query.trim().toLocaleLowerCase();
+ const tracks=rows.filter(r=>[r.track_name,r.artist_name,r.album_name].join(" ").toLocaleLowerCase().includes(term)).sort((a,b)=>(Number(b[field])||0)-(Number(a[field])||0));
+ const albumMap=new Map();
+ rows.forEach(r=>{if(!r.album_name)return;const k=r.album_uri||r.album_name;if(!albumMap.has(k))albumMap.set(k,{name:r.album_name,image:r.album_image_url,type:r.album_type,tracks:0,total:0,today:0,week:0,month:0});const a=albumMap.get(k);a.tracks++;a.total+=Number(r.total_streams)||0;a.today+=Number(r.today_streams)||0;a.week+=Number(r.week_streams)||0;a.month+=Number(r.month_streams)||0});
+ const albums=[...albumMap.values()].filter(a=>(a.name+" "+a.type).toLocaleLowerCase().includes(term)).sort((a,b)=>(b[period==="today"?"today":period==="week"?"week":period==="month"?"month":"total"]||0)-(a[period==="today"?"today":period==="week"?"week":period==="month"?"month":"total"]||0));
+ const periodLabel=period==="today"?"Hoy":period==="week"?"7 días":period==="month"?"Mes":"Total";
+ const item=(name,sub,value,i,cover)=>h("div",{className:"item",key:name+"-"+i},cover&&safeUrl(cover)?h("img",{src:safeUrl(cover),alt:"",style:{width:"38px",height:"38px",objectFit:"cover",borderRadius:"7px"}}):h("b",{className:"position"},i+1),h("div",{className:"item-main"},h("strong",null,name),h("small",null,sub||"")),h("b",{className:"value"},fmt(value)));
+ const metric=(label,value,sub)=>h("article",{className:"metric",key:label},h("span",null,label),h("strong",null,fmt(value)),sub?h("small",{className:"method"},sub):null);
+ const periods=()=>h("div",{className:"periods"},[["today","Hoy"],["week","7 días"],["month","Mes"],["total","Total"]].map(([k,v])=>h("button",{key:k,className:period===k?"active":"",onClick:()=>setPeriod(k)},v)));
+ const tabs=[["overview","Resumen"],["tracks","Canciones"],["albums","Álbumes"],["profiles","Perfiles"]];
  return h("main",{className:"analytics"},
-  h("section",{className:"hero"},h("div",{className:"eyebrow"},"GLOBAL STREAMVERSE · REACT + PYTHON"),h("h1",null,"Estadísticas"),h("p",null,"Reproducciones y rankings de la comunidad GLOBAL STREAMVERSE.")),
-  loading&&!data?h("div",{className:"notice"},"Conectando con Supabase…"):null,
+  h("section",{className:"hero"},h("div",{className:"eyebrow"},"GLOBAL STREAMVERSE · SPOTIFY STREAMS"),h("h1",null,"Spotify Streams"),h("p",null,"Seguimiento de reproducciones, rankings y actividad de la comunidad.")),
+  loading&&!data?h("div",{className:"notice"},"Cargando estadísticas…"):null,
   error?h("div",{className:"notice error"},error):null,
   data&&catalog?h(React.Fragment,null,
-   h("div",{className:"section-label"},"COMUNIDAD · PERFILES PÚBLICOS"),
-   h("section",{className:"metrics"},[["Perfiles públicos",s.public_profiles],["Streams de perfiles públicos",s.public_profile_streams],["Streams de hoy · UTC",s.public_profile_streams_today_utc],["Países representados",s.countries_represented]].map(([label,value])=>h("article",{className:"metric",key:label},h("span",null,label),h("strong",null,fmt(value))))),
-   h("div",{className:"section-label"},"CATÁLOGO GLOBAL · MUSICAT"),
-   h("section",{className:"metrics"},[["Streams registrados",cs.total_streams],["Canciones",cs.tracks],["Versiones identificadas",cs.matched_tracks],["Álbumes confirmados",cs.confirmed_albums]].map(([label,value])=>h("article",{className:"metric",key:label},h("span",null,label),h("strong",null,fmt(value))))),
-   h("section",{className:"columns"},
-    h("article",{className:"panel"},h("div",{className:"panel-head"},h("h2",null,"Top ARMY"),h("span",null,"Streams por perfil público")),h("div",{className:"rows"},(data.top_members||[]).map((m,i)=>row(m.display_name+" · @"+m.handle,m.country_code,m.total_streams,i)))),
-    h("article",{className:"panel"},h("div",{className:"panel-head"},h("h2",null,"Por país"),h("span",null,"Streams de perfiles públicos")),h("div",{className:"rows"},(data.top_countries||[]).map((c,i)=>row(c.country_code,fmt(c.members)+" perfiles",c.streams,i))))
-   ),
-   h("section",{className:"columns"},
-    h("article",{className:"panel"},h("div",{className:"panel-head"},h("h2",null,"Top canciones"),h("span",null,"Streams Musicat · catálogo global")),h("div",{className:"rows"},(ca.top_tracks||[]).map((t,i)=>row(t.track_name,t.artist_name,t.total_streams,i)))),
-    h("article",{className:"panel"},h("div",{className:"panel-head"},h("h2",null,"Top álbumes"),h("span",null,"Sólo versiones identificadas")),h("div",{className:"rows"},(ca.top_albums||[]).map((a,i)=>row(a.album_name,a.album_type,a.total_streams,i))))
-   ),
-   h("section",{className:"panel"},h("div",{className:"panel-head"},h("h2",null,"Escuchas recientes"),h("span",null,"Muestra de perfiles públicos · no histórico")),h("div",{className:"rows"},(data.recent_tracks_sample||[]).map((t,i)=>row(t.track,t.artist,t.recent_plays_sampled,i)))),
-   h("p",{className:"method"},data.methodology?.stream_totals+" "+data.methodology?.track_chart),
-   h("p",{className:"updated"},"Actualizado: "+new Date(catalog.python_analytics.generated_at).toLocaleString("es-MX",{dateStyle:"medium",timeStyle:"short"})+" · catálogo; "+new Date(data.generated_at).toLocaleString("es-MX",{dateStyle:"medium",timeStyle:"short"})+" · perfiles UTC")
+   h("nav",{className:"tabs analytics-tabs"},tabs.map(([k,v])=>h("button",{key:k,className:tab===k?"active":"",onClick:()=>{setTab(k);setQuery("")}},v))),
+   tab==="overview"?h(React.Fragment,null,
+    h("div",{className:"section-label"},"RESUMEN DE LA COMUNIDAD"),
+    h("section",{className:"metrics"},[
+     metric("Streams de perfiles públicos",summary.public_profile_streams,"Perfiles con consentimiento público"),
+     metric("Streams registrados",catalogSummary.total_streams,"Catálogo Musicat"),
+     metric("Streams de hoy",rows.reduce((n,r)=>n+(Number(r.today_streams)||0),0),"Canciones identificadas"),
+     metric("Perfiles públicos",summary.public_profiles,"Comunidad GLOBAL STREAMVERSE")
+    ]),
+    h("section",{className:"columns"},
+     h("article",{className:"panel"},h("div",{className:"panel-head"},h("h2",null,"Canciones populares"),h("span",null,"Reproducciones de hoy")),h("div",{className:"rows"},tracks.slice(0,8).map((r,i)=>item(r.track_name,r.artist_name,r.today_streams,i,r.album_image_url)))),
+     h("article",{className:"panel"},h("div",{className:"panel-head"},h("h2",null,"Álbumes destacados"),h("span",null,"Reproducciones de hoy")),h("div",{className:"rows"},albums.slice(0,8).map((a,i)=>item(a.name,a.tracks+" canciones",a.today,i,a.image)))
+    ),
+    h("section",{className:"columns"},
+     h("article",{className:"panel"},h("div",{className:"panel-head"},h("h2",null,"Top ARMY"),h("span",null,"Perfiles públicos")),h("div",{className:"rows"},(data.top_members||[]).slice(0,8).map((m,i)=>item(m.display_name+" · @"+m.handle,m.country_code,m.total_streams,i)))),
+     h("article",{className:"panel"},h("div",{className:"panel-head"},h("h2",null,"Por país"),h("span",null,"Streams públicos")),h("div",{className:"rows"},(data.top_countries||[]).slice(0,8).map((c,i)=>item(c.country_code,fmt(c.members)+" perfiles",c.streams,i))))
+    )
+   ):null,
+   tab==="tracks"||tab==="albums"?h(React.Fragment,null,
+    h("section",{className:"toolbar"},periods(),h("input",{className:"search",value:query,onChange:e=>setQuery(e.target.value),placeholder:tab==="tracks"?"Buscar canción o artista…":"Buscar álbum…","aria-label":"Buscar en estadísticas"})),
+    h("section",{className:"panel"},h("div",{className:"panel-head"},h("h2",null,tab==="tracks"?"Top canciones":"Top álbumes"),h("span",null,"Ordenado por "+periodLabel.toLowerCase())),
+     h("div",{className:"rows"},tab==="tracks"?(tracks.length?tracks.map((r,i)=>item(r.track_name,r.artist_name,Number(r[field])||0,i,r.album_image_url)):h("p",{className:"method"},"No hay canciones para esta búsqueda.")):(albums.length?albums.map((a,i)=>item(a.name,a.tracks+" canciones",a[period==="today"?"today":period==="week"?"week":period==="month"?"month":"total"],i,a.image)):h("p",{className:"method"},"No hay álbumes confirmados para esta búsqueda.")))
+    )
+   ):null,
+   tab==="profiles"?h("section",{className:"columns"},
+    h("article",{className:"panel"},h("div",{className:"panel-head"},h("h2",null,"Ranking de perfiles"),h("span",null,"Streams totales públicos")),h("div",{className:"rows"},(data.top_members||[]).map((m,i)=>item(m.display_name+" · @"+m.handle,m.country_code,m.total_streams,i)))),
+    h("article",{className:"panel"},h("div",{className:"panel-head"},h("h2",null,"Ranking por país"),h("span",null,"Streams totales públicos")),h("div",{className:"rows"},(data.top_countries||[]).map((c,i)=>item(c.country_code,fmt(c.members)+" perfiles",c.streams,i))))
+   ):null,
+   h("p",{className:"method"},"Las estadísticas de perfiles públicos y el catálogo Musicat son fuentes separadas. Las reproducciones diarias, semanales y mensuales corresponden a los registros disponibles; no se muestran estimaciones ni versiones sin identificar."),
+   h("p",{className:"updated"},"Última actualización: "+new Date(catalog.generated_at||catalog.python_analytics?.generated_at||Date.now()).toLocaleString("es-MX",{dateStyle:"medium",timeStyle:"short"}))
   ):null
  );
 }
