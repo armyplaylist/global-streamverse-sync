@@ -69,7 +69,8 @@ jobs:
         env:
           SUPABASE_URL: https://ylybwiwemlnekclrwwjq.supabase.co
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
-        run: curl --fail-with-body --silent --show-error --max-time 180 -X POST "$SUPABASE_URL/functions/v1/spotify-sync" -H "apikey: $SUPABASE_SECRET_KEY" -H "Content-Type: application/json" -d "{}"\n
+        run: curl --fail-with-body --silent --show-error --max-time 180 -X POST "$SUPABASE_URL/functions/v1/spotify-sync" -H "apikey: $SUPABASE_SECRET_KEY" -H "Content-Type: application/json" -d "{}"
+
       - name: Sync linked ListenBrainz and Last.fm histories
         env:
           SUPABASE_URL: https://ylybwiwemlnekclrwwjq.supabase.co
