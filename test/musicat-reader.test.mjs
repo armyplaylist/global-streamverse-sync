@@ -67,7 +67,8 @@ test("normalizes complete visible rows and skips incomplete rows", () => {
       artist: " BTS ",
       playedAt: "2026-11-03T02:49:19.017Z",
       source: "Spotify",
-      album: "ARIRANG"
+      album: "ARIRANG",
+      albumCoverUrl: "https://i.scdn.co/image/test-cover"
     },
     { trackId: "track-2", title: "No artist", artist: "", playedAt: "2026-11-03T02:50:00Z", source: "Spotify" }
   ]);
@@ -76,6 +77,7 @@ test("normalizes complete visible rows and skips incomplete rows", () => {
   assert.equal(rows[0].artist, "BTS");
   assert.equal(rows[0].playedAt, "2026-11-03T02:49:19.017Z");
   assert.equal(rows[0].album, "ARIRANG");
+  assert.equal(rows[0].albumCoverUrl, "https://i.scdn.co/image/test-cover");
 });
 
 test("creates a stable deduplication key from the track ID and exact timestamp", () => {
@@ -153,8 +155,10 @@ test("keeps album optional when Musicat does not expose release metadata", () =>
     title: "SWIM",
     artist: "BTS",
     playedAt: "2026-11-03T02:49:19.017Z",
-    source: "Spotify"
+    source: "Spotify",
+    albumCoverUrl: "javascript:alert(1)"
   }]);
   assert.equal(rows.length, 1);
   assert.equal(rows[0].album, null);
+  assert.equal(rows[0].albumCoverUrl, null);
 });
