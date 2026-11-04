@@ -33,7 +33,7 @@
 <section id="albumDetail" hidden></section>
 <section id="artists" class="album-section" hidden><div><h2>Artists Verse</h2><p>Ranking de artistas según los créditos exactos de Musicat. Las colaboraciones permanecen agrupadas.</p><div class="artist-list" id="artistList"><div class="detail-loading">Cargando ranking de artistas…</div></div></div></section>
 <section id="artistDetail" hidden></section>
-<section class="album-section" id="albums" hidden><div><h2>Álbumes del catálogo</h2><div class="album-grid" id="confirmedAlbums"></div></div><div><h2>Versiones por confirmar <span id="candidateCount" class="album-badge">0</span></h2><div class="album-grid" id="candidateAlbums"></div></div></section>
+<section class="album-section" id="albums" hidden><div><h2>Álbumes del catálogo</h2><div class="album-grid" id="confirmedAlbums"></div></div></section>
 
 <p class="status" id="status" aria-live="polite"></p>
 <p class="foot">Reproducciones: Musicat · Portadas y metadatos: Spotify.</p>
@@ -53,19 +53,18 @@ const esc=s=>String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&
 function releaseType(value){return value==="album"?"Álbum":value==="single"?"Single":value==="compilation"?"Compilación":value||"Lanzamiento"}
 function duration(value){const ms=Number(value);if(!Number.isFinite(ms)||ms<=0)return "";const seconds=Math.floor(ms/1000);return Math.floor(seconds/60)+":"+String(seconds%60).padStart(2,"0")}
 function countFor(r){return Number(r[period==="today"?"today_streams":period==="week"?"week_streams":period==="month"?"month_streams":"total_streams"])||0;}
-function spotifyIcon(){return '<svg class="spotify-mark" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#1ed760"/><path d="M5.2 9.2c4.7-1.4 9.9-.9 13.6 1.4M6.1 12.3c3.9-1.1 8.3-.7 11.4 1.2M7 15.2c3.1-.8 6.4-.5 8.9.9" fill="none" stroke="#102b1b" stroke-width="1.7" stroke-linecap="round"/></svg>';}
 function observedCovers(row){return Array.isArray(row.used_album_covers)?[...new Set(row.used_album_covers.filter(url=>typeof url==="string"&&/^https:\/\//i.test(url)))]:[];}
 function renderTracks(rows){
  const box=document.getElementById("songs");
  if(!rows.length){box.innerHTML='<div class="empty">No encontramos canciones con ese nombre o todavía no hay reproducciones registradas en este periodo.</div>';return;}
  box.innerHTML=rows.map((r,i)=>{
   const covers=observedCovers(r);
-  const cover=covers.length?'<img class="cover" src="'+esc(covers[0])+'" alt="Portada observada en Musicat" loading="lazy">':r.match_status==="matched"&&r.album_image_url?'<a href="'+esc(r.spotify_track_url||"https://open.spotify.com/")+'" target="_blank" rel="noopener"><img class="cover" src="'+esc(r.album_image_url)+'" alt="Portada de referencia de Spotify; edición reproducida no confirmada" loading="lazy"></a>':'<div class="cover placeholder">♫</div>';
+  const cover=covers.length?'<img class="cover" src="'+esc(covers[0])+'" alt="Portada observada en Musicat" loading="lazy">':r.match_status==="matched"&&r.album_image_url?'<img class="cover" src="'+esc(r.album_image_url)+'" alt="Portada de referencia del catálogo" loading="lazy">':'<div class="cover placeholder">♫</div>';
   const usedAlbums=Array.isArray(r.used_albums)?r.used_albums.filter(Boolean):[];
-  const album=usedAlbums.length?"Ediciones identificadas: "+usedAlbums.map(esc).join(" · "):covers.length?"Portada observada en Musicat · nombre de edición no disponible":r.match_status==="matched"?"Referencia del catálogo: "+esc(r.album_name||"álbum no indicado"):"Edición no disponible en el historial público de Musicat";
+  const album=usedAlbums.length?"Ediciones identificadas: "+usedAlbums.map(esc).join(" · "):covers.length?"Portada observada en Musicat · nombre de edición no disponible":r.match_status==="matched"?"Referencia del catálogo: "+esc(r.album_name||"álbum no indicado"):"Edición no identificada";
   const details=r.match_status==="matched"?[r.track_number&&r.album_total_tracks?"Pista "+r.track_number+"/"+r.album_total_tracks:"",r.disc_number&&r.disc_number>1?"Disco "+r.disc_number:"",duration(r.duration_ms)?"Duración "+duration(r.duration_ms):"",r.isrc?"ISRC "+r.isrc:""].filter(Boolean).join(" · "):"";
-  const link=r.match_status==="matched"&&r.spotify_track_url?'<a class="spotify-link" href="'+esc(r.spotify_track_url)+'" target="_blank" rel="noopener">'+spotifyIcon()+' Escuchar en Spotify</a>':"";
-  const tag=r.match_status==="matched"?"Spotify verificado":r.match_status==="ambiguous"?"Versión por confirmar":"Catálogo pendiente";
+  const link="";
+  const tag="Registro Musicat";
   const coverNote=covers.length?'<div class="observed-label">Portada observada en el historial de Musicat</div>':r.match_status==="matched"&&r.album_image_url?'<div class="observed-label">Portada de referencia de Spotify · no confirma la edición escuchada</div>':"";
   const historyButton=r.musicat_track_id?'<button type="button" class="detail-trigger" data-track-id="'+esc(r.musicat_track_id)+'">Ver historial</button>':"";
   return '<article class="song">'+cover+'<div class="song-main"><div class="rank">#'+(i+1)+'</div><div class="song-title">'+esc(r.track_name)+'</div><div class="artist">'+esc(r.artist_name)+'</div><div class="album">'+album+'</div>'+(details?'<div class="track-details">'+esc(details)+'</div>':"")+coverNote+'<span class="tag">'+tag+'</span><br>'+link+historyButton+'</div><div class="count"><strong>'+fmt(countFor(r))+'</strong><small>reproducciones</small></div></article>';
@@ -73,12 +72,12 @@ function renderTracks(rows){
  box.querySelectorAll("[data-track-id]").forEach(button=>button.addEventListener("click",()=>openTrackHistory(button.dataset.trackId,allRows.find(row=>String(row.musicat_track_id)===button.dataset.trackId))));
 }
 let albumCollections=[];
-function albumCard(album,index,candidate=false){
+function albumCard(album,index){
  const image=album.image?'<img class="album-cover" src="'+esc(album.image)+'" alt="Portada de '+esc(album.name)+'" loading="lazy">':'<div class="album-cover placeholder">♫</div>';
- const badge=candidate?"Por confirmar":"En catálogo";
- const sourceTracks=candidate?[...new Set((album.rows||[]).map(r=>r.track_name+" · "+r.artist_name))].join(", "):"";
- const playcount=candidate?'<span class="album-playcount">— <small>sin atribución</small></span>':'<span class="album-playcount"><strong>'+fmt(album.streamTotal||0)+'</strong><small>reproducciones</small></span>';
- return '<button type="button" class="album-card'+(candidate?' candidate':'')+'" data-album-index="'+index+'">'+image+'<span><span class="album-title">'+esc(album.name)+'</span><span class="album-sub">'+releaseType(album.type)+(album.releaseDate?" · "+esc(album.releaseDate):"")+'</span>'+(candidate?'<span class="album-sub">Canción: '+esc(sourceTracks)+'</span>':'')+'<span class="album-badge">'+badge+'</span></span>'+playcount+'<span class="album-arrow" aria-hidden="true">›</span></button>';
+ const badge="En catálogo";
+ 
+ const playcount='<span class="album-playcount"><strong>'+fmt(album.streamTotal||0)+'</strong><small>reproducciones</small></span>';
+ return '<button type="button" class="album-card" data-album-index="'+index+'">'+image+'<span><span class="album-title">'+esc(album.name)+'</span><span class="album-sub">'+releaseType(album.type)+(album.releaseDate?" · "+esc(album.releaseDate):"")+'</span><span class="album-badge">'+badge+'</span></span>'+playcount+'<span class="album-arrow" aria-hidden="true">›</span></button>';
 }
 function openAlbum(index){
  const album=albumCollections[index];if(!album)return;
@@ -155,35 +154,21 @@ async function openArtistHistory(name){
  window.scrollTo({top:0,behavior:"smooth"});
 }
 function buildAlbums(term){
- const confirmed=new Map(),candidates=new Map();
+ const confirmed=new Map();
  for(const row of allRows){
-  if(row.match_status==="matched"&&row.album_name&&row.album_image_url){
-   const key=row.album_uri||("name:"+String(row.album_name).toLowerCase());
-   if(!confirmed.has(key))confirmed.set(key,{name:row.album_name,image:row.album_image_url,uri:row.album_uri,type:row.album_type,releaseDate:row.album_release_date,rows:[],candidate:false,streamTotal:0});
-   const album=confirmed.get(key);
-   const trackKey=String(row.track_id||row.musicat_track_id||row.track_name+"|"+row.artist_name);
-   if(!album.rows.some(x=>String(x.track_id||x.musicat_track_id||x.track_name+"|"+x.artist_name)===trackKey)){album.rows.push(row);album.streamTotal+=Number(row.total_streams)||0;}
-  }
-  if(row.match_status==="ambiguous"&&Array.isArray(row.spotify_candidates)){
-   for(const item of row.spotify_candidates){
-    if(!item.album_name||!item.album_image_url)continue;
-    const key=item.album_uri||("name:"+String(item.album_name).toLowerCase());
-    if(confirmed.has(key))continue;
-    if(!candidates.has(key))candidates.set(key,{name:item.album_name,image:item.album_image_url,uri:item.album_uri,type:item.album_type,releaseDate:item.album_release_date,rows:[],candidate:true});
-    if(!candidates.get(key).rows.some(existing=>String(existing.musicat_track_id||existing.track_name)===String(row.musicat_track_id||row.track_name)))candidates.get(key).rows.push(row);
-   }
-  }
+  if(row.match_status!=="matched"||!row.album_name||!row.album_image_url)continue;
+  const key=row.album_uri||("name:"+String(row.album_name).toLowerCase());
+  if(!confirmed.has(key))confirmed.set(key,{name:row.album_name,image:row.album_image_url,uri:row.album_uri,type:row.album_type,releaseDate:row.album_release_date,rows:[],candidate:false,streamTotal:0});
+  const album=confirmed.get(key);
+  const trackKey=String(row.track_id||row.musicat_track_id||row.track_name+"|"+row.artist_name);
+  if(!album.rows.some(x=>String(x.track_id||x.musicat_track_id||x.track_name+"|"+x.artist_name)===trackKey)){album.rows.push(row);album.streamTotal+=Number(row.total_streams)||0;}
  }
- const matches=a=>(a.name+" "+a.rows.map(r=>r.track_name).join(" ")).toLowerCase().includes(term);
+ const matches=album=>(album.name+" "+album.rows.map(row=>row.track_name).join(" ")).toLowerCase().includes(term);
  const known=[...confirmed.values()].filter(matches).sort((a,b)=>b.streamTotal-a.streamTotal||a.name.localeCompare(b.name));
- const possible=[...candidates.values()].filter(matches).sort((a,b)=>a.name.localeCompare(b.name));
- albumCollections=[...known,...possible];
- document.getElementById("candidateCount").textContent=String(possible.length);
- document.getElementById("meta").textContent=known.length+" álbumes · "+possible.length+" versiones por confirmar";
- document.getElementById("confirmedAlbums").innerHTML=known.length?known.map((a,i)=>albumCard(a,i,false)).join(""):'<div class="empty album-empty">Todavía no hay álbumes con coincidencia única en el catálogo.</div>';
- document.getElementById("candidateAlbums").innerHTML=possible.length?possible.map((a,i)=>albumCard(a,known.length+i,true)).join(""):'<div class="empty album-empty">No hay versiones candidatas pendientes con esta búsqueda.</div>';
- document.getElementById("confirmedAlbums").querySelectorAll("[data-album-index]").forEach(b=>b.addEventListener("click",()=>openAlbum(Number(b.dataset.albumIndex))));
- document.getElementById("candidateAlbums").querySelectorAll("[data-album-index]").forEach(b=>b.addEventListener("click",()=>openAlbum(Number(b.dataset.albumIndex))));
+ albumCollections=known;
+ document.getElementById("meta").textContent=known.length+" álbumes confirmados";
+ document.getElementById("confirmedAlbums").innerHTML=known.length?known.map((album,index)=>albumCard(album,index,false)).join(""):'<div class="empty album-empty">Todavía no hay álbumes confirmados para esta búsqueda.</div>';
+ document.getElementById("confirmedAlbums").querySelectorAll("[data-album-index]").forEach(button=>button.addEventListener("click",()=>openAlbum(Number(button.dataset.albumIndex))));
 }
 function render(){
  const term=document.getElementById("search").value.trim().toLowerCase();
