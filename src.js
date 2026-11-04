@@ -8,8 +8,8 @@ const safeUrl=v=>{try{const u=new URL(v);return u.protocol==="https:"?u.href:""}
 const releaseType=v=>v==="album"?"Álbum":v==="single"?"Single":v==="compilation"?"Compilación":v||"Lanzamiento";
 const duration=v=>{const ms=Number(v);if(!Number.isFinite(ms)||ms<=0)return"";const s=Math.floor(ms/1000);return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")};
 function Analytics(){
- const[data,setData]=useState(null),[catalog,setCatalog]=useState(null),[error,setError]=useState(""),[loading,setLoading]=useState(true),[reload,setReload]=useState(0);
- useEffect(()=>{let live=true;setLoading(true);setError("");Promise.all([
+ const[data,setData]=useState(null),[catalog,setCatalog]=useState(null),[health,setHealth]=useState(null),[error,setError]=useState(""),[loading,setLoading]=useState(true),[reload,setReload]=useState(0);
+ useEffect(()=>{let live=true;setLoading(true);setError("");fetch("/api/health").then(r=>r.ok?r.json():null).then(v=>{if(live)setHealth(v)}).catch(()=>{if(live)setHealth(null)});Promise.all([
   fetch("/api/analytics").then(async r=>{if(!r.ok)throw Error("No se pudieron cargar las estadísticas comunitarias.");return r.json()}),
   fetch("/api/catalog").then(async r=>{if(!r.ok)throw Error("No se pudo cargar el ranking de canciones y álbumes.");return r.json()})
  ]).then(([a,c])=>{if(live){setData(a);setCatalog(c)}}).catch(e=>{if(live)setError(e.message||"Error de conexión")}).finally(()=>{if(live)setLoading(false)});
@@ -18,6 +18,7 @@ function Analytics(){
  const row=(name,sub,value,i)=>h("div",{className:"item",key:name+"-"+i},h("b",{className:"position"},i+1),h("div",{className:"item-main"},h("strong",null,name),h("small",null,sub||"")),h("b",{className:"value"},value==="—"?"—":fmt(value)));
  return h("main",{className:"analytics"},
   h("section",{className:"hero"},h("div",{className:"eyebrow"},"GLOBAL STREAMVERSE · REACT + PYTHON"),h("h1",null,"Community insights"),h("p",null,"Rankings comunitarios, canciones y álbumes con datos de GLOBAL STREAMVERSE."),h("button",{className:"refresh",onClick:()=>setReload(x=>x+1),disabled:loading},loading?"Actualizando…":"↻ Actualizar datos")),
+  h("section",{className:"panel",style:{display:"flex",alignItems:"center",justifyContent:"space-between",gap:"12px",flexWrap:"wrap"}},h("div",null,h("strong",null,"Python API"),h("p",{className:"method"},health?.service||"Comprobando servicio…")),h("span",{className:"home-pill",style:{background:health?.ok?"#e7f8ee":"#f5effa",color:health?.ok?"#247347":"#7952c7"}},health?.ok?"● EN LÍNEA":"◌ VERIFICANDO")),
   loading&&!data?h("div",{className:"notice"},"Conectando con Supabase…"):null,
   error?h("div",{className:"notice error"},error):null,
   data&&catalog?h(React.Fragment,null,
