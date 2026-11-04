@@ -99,13 +99,4 @@ jobs:
             -H "apikey: $SUPABASE_SECRET_KEY" \
             -H "Content-Type: application/json" \
             -d '{}'
-      - name: Sync ListenBrainz and Last.fm history
-        env:
-          SUPABASE_URL: https://ylybwiwemlnekclrwwjq.supabase.co
-          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
-        run: |
-          curl --fail-with-body --silent --show-error --retry 2 --retry-delay 3 -X POST "$SUPABASE_URL/functions/v1/scrobble-sync" \
-            -H "apikey: $SUPABASE_SECRET_KEY" \
-            -H "Content-Type: application/json" \
-            -d '{}'
 
