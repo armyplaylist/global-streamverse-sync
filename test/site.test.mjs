@@ -27,8 +27,9 @@ test("registration collects nickname, country, Musicat profile and consent", () 
 test("shows public nickname and country flag directory, not account credentials", () => {
   assert.match(html, /id="memberDirectory"/);
   assert.match(html, /countryFlag\(m\.country_code\)/);
-  assert.match(html, /display_name,country_code,created_at/);
-  assert.match(html, /participant_directory\?select=display_name,country_code,created_at/);
+  assert.match(html, /get_public_profiles/);
+  assert.match(html, /m\.display_name/);
+  assert.match(html, /m\.handle/);
   assert.doesNotMatch(html, /participant_directory\?select=[^"`]*\b(?:login_username|password|provider_username|public_profile_url)\b/i);
   assert.match(html, /name\.textContent=m\.display_name/);
   assert.match(html, /country\.textContent=COUNTRY_NAMES\[m\.country_code\]/);
@@ -52,7 +53,8 @@ test("uses the public Supabase key only as an apikey header", () => {
 
 
 test("profile exposes secure Musicat refresh and separates capture, play and record times", () => {
-  assert.match(profile, /id="refresh">Actualizar desde Musicat/);
+  assert.match(profile, /id="refresh"/);
+  assert.match(profile, /Actualizar Musicat/);
   assert.match(profile, /musicat_sync_requests/);
   assert.match(profile, /last_capture_at/);
   assert.match(profile, /last_played_at/);
@@ -60,4 +62,16 @@ test("profile exposes secure Musicat refresh and separates capture, play and rec
   const match = profile.match(/<script>([\s\S]*?)<\/script>/);
   assert.ok(match, "profile script should exist");
   assert.doesNotThrow(() => new Script(match[1]), "profile JavaScript should parse");
+});
+
+test("React profile preserves private auth, editable identity, Spotify and scrobble connections", () => {
+  const app = readFileSync(new URL("../src.js", import.meta.url), "utf8");
+  assert.match(app, /function Profile\(\)/);
+  assert.match(app, /identity\(\{\.\.\.person,\.\.\.mine\}\)/);
+  assert.match(app, /window\.location\.href="\/#access"/);
+  assert.match(app, /spotify-oauth/);
+  assert.match(app, /Conectar con Spotify/);
+  assert.match(app, /Conectar ListenBrainz/);
+  assert.match(app, /Conectar Last\.fm/);
+  assert.match(app, /musicat_sync_requests/);
 });
