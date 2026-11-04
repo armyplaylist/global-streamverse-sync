@@ -150,7 +150,7 @@ async function openMusicatHistory(browser, profileUrl) {
     if (!profileResponse?.ok()) {
       throw new Error("Musicat profile returned HTTP " + (profileResponse?.status() ?? "no response"));
     }
-    const userId = await waitForMusicatUserId(page, 15000);
+    const userId = await waitForMusicatUserId(page, 25000);
     if (!userId) {
       throw new Error("Musicat did not finish loading a valid public user history link after 15 seconds.");
     }
