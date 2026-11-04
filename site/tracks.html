@@ -16,19 +16,21 @@
 .album-detail-head{display:flex;align-items:center;gap:12px;margin-bottom:16px}.album-back{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 12px;font-weight:800;color:var(--ink);cursor:pointer}.album-detail-title{font-size:19px;font-weight:900;margin:0}.album-detail-cover{width:100%;max-width:180px;aspect-ratio:1;object-fit:cover;border-radius:14px;margin:0 auto 12px;display:block}.album-detail-summary{text-align:center;margin-bottom:18px}.album-detail-summary .album-sub{max-width:480px;margin:6px auto}.album-track-row{display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:10px;align-items:center;padding:12px;border-bottom:1px solid var(--line);background:#fff}.album-track-row:first-child{border-radius:13px 13px 0 0}.album-track-row:last-child{border-bottom:0;border-radius:0 0 13px 13px}.album-track-num{color:#9a91a5;font-size:12px;text-align:center}.album-track-name{font-size:13px;font-weight:850}.album-track-artist{font-size:11px;color:#81778f;margin-top:3px}.album-track-count{text-align:right;white-space:nowrap}.album-track-count strong{display:block;font-size:16px}.album-track-count small{font-size:9px;color:#81778f}@media(max-width:600px){.album-card{grid-template-columns:58px minmax(0,1fr) auto auto;padding:11px 10px;gap:11px}.album-cover{width:58px;height:58px}.view-tabs{margin-top:14px}.album-track-row{grid-template-columns:28px minmax(0,1fr) auto;padding:10px 8px}}@media(max-width:600px){.summary{gap:7px}.stat{padding:11px 9px}.stat strong{font-size:20px}.song{grid-template-columns:64px minmax(0,1fr) auto;gap:10px;padding:10px}.cover{width:64px;height:64px}.count{min-width:74px}.count strong{font-size:18px}.count small{font-size:9px}.toolbar{align-items:stretch}.search{max-width:none;width:100%}}
 .bottom-dock{position:fixed;z-index:50;left:50%;bottom:max(12px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(540px,calc(100% - 28px));display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:8px;background:rgba(255,255,255,.94);border:1px solid #e6def0;border-radius:22px;box-shadow:0 12px 38px #30234220;backdrop-filter:blur(18px)}.dock-link{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:48px;color:#81778f;text-decoration:none;font-size:10px;font-weight:750;border-radius:14px}.dock-link svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.dock-link.active,.dock-link:hover{color:#7952c7;background:#f1eafa}body{padding-bottom:100px}html{scroll-padding-top:24px}@media(min-width:760px){.bottom-dock{bottom:18px}}
 .refresh-catalog{border:1px solid #d9cbed;border-radius:11px;background:#f0eafa;color:#513c78;padding:10px 13px;font:700 12px inherit;cursor:pointer;white-space:nowrap}.refresh-catalog:disabled{opacity:.55;cursor:wait}@media(max-width:580px){.toolbar{flex-wrap:wrap}.refresh-catalog{flex:0 0 auto}}
-.detail-trigger{display:inline-flex;margin-top:7px;border:1px solid #ded5ea;border-radius:8px;padding:6px 9px;background:#f7f4fb;color:#5c4386;font:750 10px system-ui,sans-serif;cursor:pointer}.history-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0}.history-stat{background:#fff;border:1px solid var(--line);border-radius:11px;padding:10px}.history-stat small{display:block;color:var(--muted);font-size:10px}.history-stat strong{display:block;font-size:18px;margin-top:3px}.history-bars{display:grid;grid-template-columns:repeat(30,minmax(0,1fr));gap:3px;align-items:end;min-height:120px;padding:14px 8px 8px;background:#fff;border:1px solid var(--line);border-radius:12px}.history-bar-cell{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;min-width:0}.history-bar{width:100%;min-height:2px;background:linear-gradient(180deg,#a98bdb,#7952c7);border-radius:4px 4px 1px 1px}.history-bar-cell small{font-size:8px;color:var(--muted);white-space:nowrap;writing-mode:vertical-rl;transform:rotate(180deg)}.history-note{font-size:10px;color:var(--muted);margin:8px 2px}.detail-loading{padding:18px;background:#fff;border:1px dashed var(--line);border-radius:12px;color:var(--muted);font-size:12px}@media(max-width:600px){.history-summary{gap:6px}.history-stat{padding:8px}.history-stat strong{font-size:15px}.history-bars{gap:2px;min-height:100px}}</style>
+.detail-trigger{display:inline-flex;margin-top:7px;border:1px solid #ded5ea;border-radius:8px;padding:6px 9px;background:#f7f4fb;color:#5c4386;font:750 10px system-ui,sans-serif;cursor:pointer}.history-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0}.history-stat{background:#fff;border:1px solid var(--line);border-radius:11px;padding:10px}.history-stat small{display:block;color:var(--muted);font-size:10px}.history-stat strong{display:block;font-size:18px;margin-top:3px}.history-bars{display:grid;grid-template-columns:repeat(30,minmax(0,1fr));gap:3px;align-items:end;min-height:120px;padding:14px 8px 8px;background:#fff;border:1px solid var(--line);border-radius:12px}.history-bar-cell{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;min-width:0}.history-bar{width:100%;min-height:2px;background:linear-gradient(180deg,#a98bdb,#7952c7);border-radius:4px 4px 1px 1px}.history-bar-cell small{font-size:8px;color:var(--muted);white-space:nowrap;writing-mode:vertical-rl;transform:rotate(180deg)}.history-note{font-size:10px;color:var(--muted);margin:8px 2px}.detail-loading{padding:18px;background:#fff;border:1px dashed var(--line);border-radius:12px;color:var(--muted);font-size:12px}@media(max-width:600px){.history-summary{gap:6px}.history-stat{padding:8px}.history-stat strong{font-size:15px}.history-bars{gap:2px;min-height:100px}}
+.artist-list{display:grid;gap:8px}.artist-card{display:grid;grid-template-columns:42px minmax(0,1fr) auto;gap:12px;align-items:center;width:100%;padding:13px;background:#fff;border:1px solid var(--line);border-radius:13px;text-align:left;color:var(--ink);font:inherit;cursor:pointer}.artist-rank{display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:#f1ebfa;color:#6b4ba2;font-weight:900}.artist-name{font-size:14px;font-weight:900;overflow-wrap:anywhere}.artist-sub{font-size:10px;color:var(--muted);margin-top:3px}.artist-count{text-align:right;white-space:nowrap}.artist-count strong{display:block;font-size:18px}.artist-count small{font-size:9px;color:var(--muted)}.artist-detail-tracks{margin-top:14px;background:#fff;border:1px solid var(--line);border-radius:13px;overflow:hidden}.artist-track{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:9px;align-items:center;padding:11px;border-bottom:1px solid var(--line)}.artist-track:last-child{border-bottom:0}.artist-track strong{font-size:12px}.artist-track small{display:block;color:var(--muted);font-size:10px}.artist-track b{font-size:13px}
+</style>
 </head>
 <body>
 <header><div class="wrap nav"><a class="brand" href="/">GLOBAL <span>STREAMVERSE</span></a><a class="btn" href="/">Volver al inicio</a></div></header>
 <main class="wrap">
 <section class="hero"><div class="eyebrow">Global song charts</div><h1>TRACKS <span style="color:#7952c7">VERSE</span></h1></section>
 <section class="summary"><article class="stat"><small>Reproducciones registradas</small><strong id="total">—</strong></article><article class="stat"><small>Canciones identificadas</small><strong id="identified">—</strong></article><article class="stat"><small>Canciones en catálogo</small><strong id="songsCount">—</strong></article></section>
-<div class="view-tabs" role="group" aria-label="Tipo de catálogo"><button class="view-tab active" data-view="tracks">Canciones</button><button class="view-tab" data-view="albums">Álbumes</button></div>
+<div class="view-tabs" role="group" aria-label="Tipo de catálogo"><button class="view-tab active" data-view="tracks">Canciones</button><button class="view-tab" data-view="albums">Álbumes</button><button class="view-tab" data-view="artists">Artistas</button></div>
 <section class="toolbar"><div class="periods" role="group" aria-label="Periodo"><button class="period active" data-period="total">Total</button><button class="period" data-period="today">Hoy</button><button class="period" data-period="week">7 días</button><button class="period" data-period="month">Mes</button></div><input class="search" id="search" type="search" placeholder="Buscar álbum, canción o artista…" aria-label="Buscar álbum, canción o artista"><button class="refresh-catalog" id="refreshCatalog" type="button">↻ Actualizar</button></section>
 <p class="meta" id="meta">Cargando recuento global…</p>
 <section class="songs" id="songs"><div class="empty">Preparando el catálogo de canciones…</div></section>
 <section id="trackDetail" hidden></section>
-<section id="albumDetail" hidden></section>
+<section id="albumDetail" hidden></section>\n<section id="artists" class="album-section" hidden><div><h2>Artists Verse</h2><p>Ranking de artistas según los créditos exactos de Musicat. Las colaboraciones permanecen agrupadas.</p><div class="artist-list" id="artistList"><div class="detail-loading">Cargando ranking de artistas…</div></div></div></section>\n<section id="artistDetail" hidden></section>
 <section class="album-section" id="albums" hidden><div><h2>Álbumes del catálogo</h2><div class="album-grid" id="confirmedAlbums"></div></div><div><h2>Versiones por confirmar <span id="candidateCount" class="album-badge">0</span></h2><div class="album-grid" id="candidateAlbums"></div></div></section>\n
 <p class="status" id="status" aria-live="polite"></p>
 <p class="foot">Reproducciones: Musicat · Portadas y metadatos: Spotify.</p>
@@ -42,7 +44,7 @@
 const SUPABASE_URL="https://ylybwiwemlnekclrwwjq.supabase.co";
 const SUPABASE_KEY="sb_publishable_CLbbu_GKYbH5sRB9R-EsSg_r3-jL9BN";
 const endpoint=SUPABASE_URL+"/functions/v1/tracks-catalog";
-let allRows=[],period="total",activeView="tracks";
+let allRows=[],period="total",activeView="tracks",artistRows=[];
 const fmt=n=>(Number(n)||0).toLocaleString("en-US");
 const esc=s=>String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function releaseType(value){return value==="album"?"Álbum":value==="single"?"Single":value==="compilation"?"Compilación":value||"Lanzamiento"}
@@ -119,6 +121,36 @@ async function loadAlbumHistory(album){
  try{const data=await fetchHistory({detail:"album",album_uri:album.uri});const title=document.createElement("h3");title.className="album-detail-title";title.textContent="Evolución del álbum";renderHistoryPanel(box,data);box.prepend(title)}
  catch(error){box.textContent=error.message||"No se pudo cargar el historial del álbum."}
 }
+async function loadArtists(){
+ const box=document.getElementById("artistList");
+ box.innerHTML='<div class="detail-loading">Cargando ranking de artistas…</div>';
+ try{
+  const data=await fetchHistory({detail:"artists"});
+  artistRows=Array.isArray(data.artists)?data.artists:[];
+  box.innerHTML=artistRows.length?artistRows.map((a,i)=>'<button type="button" class="artist-card" data-artist="'+esc(a.artist)+'"><span class="artist-rank">#'+(i+1)+'</span><span><span class="artist-name">'+esc(a.artist)+'</span><span class="artist-sub">'+fmt(a.track_count)+' canciones · '+fmt(a.streams_30d)+' streams en 30 días</span></span><span class="artist-count"><strong>'+fmt(a.total_streams)+'</strong><small>streams</small></span></button>').join(""):'<div class="empty">Todavía no hay reproducciones con artista registrado.</div>';
+  box.querySelectorAll("[data-artist]").forEach(button=>button.addEventListener("click",()=>openArtistHistory(button.dataset.artist)));
+  document.getElementById("meta").textContent=fmt(data.artist_count)+" créditos de artista · "+fmt(data.total_streams)+" reproducciones Musicat";
+ }catch(error){box.innerHTML='<div class="empty">'+esc(error.message||"No se pudo cargar el ranking de artistas.")+'</div>'}
+}
+async function openArtistHistory(name){
+ const box=document.getElementById("artistDetail");if(!box||!name)return;
+ document.getElementById("artists").hidden=true;box.hidden=false;
+ box.innerHTML='<div class="album-detail-head"><button class="album-back" id="backToArtists">← Artistas</button></div><div class="album-detail-summary"><h2 class="album-detail-title">'+esc(name)+'</h2><div class="detail-loading">Cargando historial del artista…</div></div>';
+ document.getElementById("backToArtists").addEventListener("click",()=>{box.hidden=true;document.getElementById("artists").hidden=false});
+ try{
+  const data=await fetchHistory({detail:"artist",artist_name:name});
+  const summary=document.createElement("section");summary.className="album-detail-summary";
+  const title=document.createElement("h3");title.className="album-detail-title";title.textContent="Evolución de reproducciones";
+  renderHistoryPanel(summary,data);summary.prepend(title);
+  const top=document.createElement("section");top.className="artist-detail-tracks";
+  const heading=document.createElement("h3");heading.className="album-detail-title";heading.style.padding="14px";heading.textContent="Canciones más reproducidas";
+  top.append(heading);
+  (data.top_tracks||[]).forEach((track,i)=>{const row=document.createElement("div");row.className="artist-track";const rank=document.createElement("span");rank.className="rank";rank.textContent="#"+(i+1);const name=document.createElement("div");const strong=document.createElement("strong");strong.textContent=track.track;const small=document.createElement("small");small.textContent=track.last_played?"Última reproducción: "+new Date(track.last_played).toLocaleDateString():"";name.append(strong,small);const count=document.createElement("b");count.textContent=fmt(track.total_streams);row.append(rank,name,count);top.append(row)});
+  const note=document.createElement("p");note.className="history-note";note.textContent=data.methodology||"Historial de eventos Musicat. Las colaboraciones se atribuyen al crédito completo.";
+  box.querySelector(".album-detail-summary").append(summary,top,note);
+ }catch(error){const loading=box.querySelector(".detail-loading");if(loading)loading.textContent=error.message||"No se pudo cargar el historial."}
+ window.scrollTo({top:0,behavior:"smooth"});
+}
 function buildAlbums(term){
  const confirmed=new Map(),candidates=new Map();
  for(const row of allRows){
@@ -159,8 +191,8 @@ function render(){
  document.getElementById("songsCount").textContent=fmt(allRows.length);
  document.getElementById("meta").textContent=activeView==="tracks"?rows.length+" canciones":"";
  document.getElementById("songs").hidden=activeView!=="tracks";
- document.getElementById("trackDetail").hidden=true;
- document.getElementById("albums").hidden=activeView!=="albums";document.getElementById("albumDetail").hidden=true;
+ document.getElementById("trackDetail").hidden=true;\n document.getElementById("artistDetail").hidden=true;
+ document.getElementById("albums").hidden=activeView!=="albums";document.getElementById("albumDetail").hidden=true;\n document.getElementById("artists").hidden=activeView!=="artists";\n document.querySelector(".toolbar").hidden=activeView==="artists";\n if(activeView==="artists")loadArtists();
  document.querySelector(".periods").style.display=activeView==="tracks"?"flex":"none";
  if(activeView==="tracks")renderTracks(rows);else buildAlbums(term);
 }
