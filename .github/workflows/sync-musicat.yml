@@ -31,11 +31,8 @@ jobs:
       - name: Test Python analytics API
         run: python -m unittest discover -s tests -p "test_*.py" -v
 
-  sync:
-    if: github.event_name != 'pull_request'
-    needs: python-tests
+  node-tests:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -46,14 +43,23 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci --ignore-scripts
-      - name: Run unit tests
+      - name: Run unit and browser-page tests
         run: npm test
-      - name: Check approval and sync scripts
+      - name: Check sync scripts
         run: |
           node --check scripts/supabase-api.mjs
           node --check scripts/approve-musicat-participants.mjs
           node --check scripts/sync-musicat.mjs
           node --check src.js
+
+  sync:
+    if: github.event_name != 'pull_request'
+    needs: [python-tests, node-tests]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
       - name: Verify protected secret exists
