@@ -139,6 +139,62 @@ async function loadHistoryDetail(baseUrl: string, serviceKey: string, params: UR
     const events = await fetchAllEvents(baseUrl, serviceKey, "dedupe_key=like." + encodeURIComponent("musicat:" + id + ":*"));
     return json({ type: "track", musicat_track_id: id, ...historySummary(events) });
   }
+  if (kind === "artists") {
+    const events = await fetchAllEvents(baseUrl, serviceKey, "artist=not.is.null");
+    const groups = new Map<string, { artist: string; total_streams: number; tracks: Set<string>; daily: Map<string, number>; last_played: string }>();
+    for (const event of events) {
+      const artist = String(event.artist || "").trim();
+      if (!artist) continue;
+      let item = groups.get(artist);
+      if (!item) {
+        item = { artist, total_streams: 0, tracks: new Set<string>(), daily: new Map<string, number>(), last_played: "" };
+        groups.set(artist, item);
+      }
+      item.total_streams++;
+      if (event.track) item.tracks.add(String(event.track));
+      const date = new Date(event.played_at);
+      if (Number.isFinite(date.getTime())) {
+        const day = date.toISOString().slice(0, 10);
+        item.daily.set(day, (item.daily.get(day) || 0) + 1);
+        if (!item.last_played || date.getTime() > new Date(item.last_played).getTime()) item.last_played = date.toISOString();
+      }
+    }
+    const today = new Date();
+    const utcToday = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate());
+    const artists = [...groups.values()].map(item => {
+      const last7 = [...item.daily.entries()].filter(([day]) => day >= new Date(utcToday - 6 * 86400000).toISOString().slice(0, 10)).reduce((sum, [, count]) => sum + count, 0);
+      const last30 = [...item.daily.entries()].filter(([day]) => day >= new Date(utcToday - 29 * 86400000).toISOString().slice(0, 10)).reduce((sum, [, count]) => sum + count, 0);
+      return { artist: item.artist, total_streams: item.total_streams, track_count: item.tracks.size, streams_7d: last7, streams_30d: last30, last_played: item.last_played || null };
+    }).sort((a, b) => b.total_streams - a.total_streams || a.artist.localeCompare(b.artist)).slice(0, 100);
+    return json({
+      type: "artists",
+      total_streams: events.length,
+      artist_count: groups.size,
+      artists,
+      methodology: "Ranking agrupado por el crédito exacto de artista registrado por Musicat. Los créditos colaborativos se mantienen juntos; no se reparten streams entre integrantes."
+    });
+  }
+  if (kind === "artist") {
+    const artist = (params.get("artist_name") || "").trim();
+    if (!artist || artist.length > 300 || /[\u0000-\u001f]/.test(artist)) {
+      return json({ error: "Invalid artist name" }, 400);
+    }
+    const events = await fetchAllEvents(baseUrl, serviceKey, "artist=eq." + encodeURIComponent(artist));
+    const summary = historySummary(events);
+    const tracks = new Map<string, { track: string; total_streams: number; last_played: string }>();
+    for (const event of events) {
+      const track = String(event.track || "").trim();
+      if (!track) continue;
+      const item = tracks.get(track) || { track, total_streams: 0, last_played: "" };
+      item.total_streams++;
+      if (event.played_at && (!item.last_played || new Date(event.played_at).getTime() > new Date(item.last_played).getTime())) item.last_played = event.played_at;
+      tracks.set(track, item);
+    }
+    return json({
+      type: "artist", artist, ...summary,
+      top_tracks: [...tracks.values()].sort((a, b) => b.total_streams - a.total_streams || a.track.localeCompare(b.track)).slice(0, 20)
+    });
+  }
   if (kind === "album") {
     const uri = params.get("album_uri") || "";
     if (!uri.startsWith("https://open.spotify.com/album/") || uri.length > 300) {
