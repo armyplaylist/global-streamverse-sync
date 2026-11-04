@@ -66,6 +66,7 @@ export function normalizeMusicatRows(rows) {
     const artist = String(row?.artist || "").trim();
     const playedAt = String(row?.playedAt || "").trim();
     const source = String(row?.source || "").trim();
+    const album = String(row?.album || "").trim();
     const timestamp = Date.parse(playedAt);
     if (!trackId || !title || !artist || !source || !Number.isFinite(timestamp)) continue;
     normalized.push({
@@ -73,7 +74,8 @@ export function normalizeMusicatRows(rows) {
       title,
       artist,
       playedAt: new Date(timestamp).toISOString(),
-      source
+      source,
+      album: album || null
     });
   }
   return normalized;
@@ -143,6 +145,8 @@ export async function collectMusicatHistorySince(page, since, options = {}) {
       const titleLink = row.querySelector('a[class*="PlayedMusic_title"]');
       const artistNode = row.querySelector('[class*="PlayedMusic_artists"]');
       const sourceNode = row.querySelector('[class*="PlayedMusic_played"]');
+      // Prefer an explicit album link; fall back to Musicat's album-labelled row metadata.
+      const albumNode = row.querySelector('a[href^="/albums/"], [class*="PlayedMusic_album"], [data-testid*="album"]');
       const trackHref = titleLink?.getAttribute("href")
         || row.querySelector('a[href^="/tracks/"]')?.getAttribute("href")
         || "";
@@ -153,7 +157,8 @@ export async function collectMusicatHistorySince(page, since, options = {}) {
         title: titleLink?.innerText?.trim() || "",
         artist: artistNode?.innerText?.trim() || "",
         playedAt: time.getAttribute("datetime") || "",
-        source: sourceNode?.innerText?.trim() || ""
+        source: sourceNode?.innerText?.trim() || "",
+        album: albumNode?.innerText?.trim() || albumNode?.getAttribute("aria-label")?.trim() || albumNode?.getAttribute("title")?.trim() || ""
       };
     }).filter(Boolean);
   });
