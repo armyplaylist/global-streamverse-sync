@@ -3,7 +3,7 @@ import time
 from datetime import datetime, timezone
 
 import requests
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 
 SUPABASE_URL = os.getenv("SUPABASE_URL", "https://ylybwiwemlnekclrwwjq.supabase.co").rstrip("/")
@@ -13,16 +13,21 @@ _cache = {"created": 0.0, "data": None}
 CACHE_SECONDS = 45
 
 
-def load_catalog():
+def load_catalog(params=None):
+    request_params = dict(params or {})
+    if not request_params.get("detail"):
+        request_params = {"limit": 250}
     response = requests.get(
         f"{SUPABASE_URL}/functions/v1/tracks-catalog",
-        params={"limit": 250},
+        params=request_params,
         headers={"apikey": SUPABASE_KEY},
         timeout=25,
     )
     if not response.ok:
         raise RuntimeError(f"Track catalog returned HTTP {response.status_code}")
     payload = response.json()
+    if request_params.get("detail"):
+        return payload
     rows = payload.get("rows") if isinstance(payload, dict) else None
     if not isinstance(rows, list):
         raise RuntimeError("Track catalog returned an unexpected response.")
@@ -82,7 +87,12 @@ def load_catalog():
 
 
 @app.get("/api/catalog")
-def catalog():
+def catalog(request: Request):
+    if request.query_params.get("detail") in ("track", "album", "artist", "artists"):
+        try:
+            return load_catalog(request.query_params)
+        except Exception:
+            raise HTTPException(status_code=502, detail="No se pudo cargar el historial. Intenta de nuevo en un momento.")
     now = time.time()
     if _cache["data"] is not None and now - _cache["created"] < CACHE_SECONDS:
         return JSONResponse(_cache["data"], headers={"Cache-Control": "public, max-age=45"})
