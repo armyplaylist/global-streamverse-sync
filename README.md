@@ -36,3 +36,12 @@ The sync workflow runs automatically every five minutes, can also be started man
 - Sync approved Musicat profiles — scheduled every 10 minutes, with manual and main-branch push triggers.
 
 No song, album, or artist rankings are produced by this project.
+
+
+## React + Python analytics
+
+- The React shell lives in the repository root (`index.html` and `src.js`) and keeps the existing public Musicat pages available while the migration continues.
+- The React **Estadísticas** page calls the FastAPI endpoint at `/api/analytics`.
+- The Python endpoint reads only the public, consented directory via the `get_public_profiles` and `get_public_profile` RPCs. It does not use a service-role or Supabase secret key.
+- The analytics endpoint caches responses briefly and labels the track list as a recent sample (up to 50 latest events per public profile), not an all-time track ranking.
+- Vercel uses the lightweight root `requirements.txt`; the separate Streamlit admin app keeps its own dependencies in `admin/requirements.txt`.
