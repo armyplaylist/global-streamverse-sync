@@ -180,7 +180,6 @@ export async function collectMusicatHistorySince(page, since, options = {}) {
         albumLabelNode?.getAttribute("aria-label")?.trim(),
         albumLabelNode?.getAttribute("title")?.trim(),
       ].find(value => value && !/^(album|album art|album cover|cover|artwork)$/i.test(value)) || "";
-      const albumCoverUrl = albumImage?.currentSrc || albumImage?.src || "";
       const trackHref = titleLink?.getAttribute("href")
         || row.querySelector('a[href^="/tracks/"]')?.getAttribute("href")
         || "";
