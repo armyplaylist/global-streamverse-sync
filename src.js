@@ -27,7 +27,7 @@ function Analytics(){
  const periods=()=>h("div",{className:"periods"},[["today","Hoy"],["week","7 días"],["month","Mes"],["total","Total"]].map(([k,v])=>h("button",{key:k,className:period===k?"active":"",onClick:()=>setPeriod(k)},v)));
  const tabs=[["overview","Resumen"],["tracks","Canciones"],["albums","Álbumes"],["profiles","Perfiles"]];
  return h("main",{className:"analytics"},
-  h("section",{className:"hero"},h("div",{className:"eyebrow"},"GLOBAL STREAMVERSE · SPOTIFY STREAMS"),h("h1",null,"Spotify Streams"),h("p",null,"Seguimiento de reproducciones, rankings y actividad de la comunidad.")),
+  h("section",{className:"hero"},h("div",{className:"eyebrow"},"GLOBAL STREAMVERSE · COMMUNITY CHARTS"),h("h1",null,"Estadísticas globales"),h("p",null,"Reproducciones verificadas, canciones, álbumes y actividad de ARMY en todo el mundo.")),
   loading&&!data?h("div",{className:"notice"},"Cargando estadísticas…"):null,
   error?h("div",{className:"notice error"},error):null,
   data&&catalog?h(React.Fragment,null,
