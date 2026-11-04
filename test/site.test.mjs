@@ -123,6 +123,13 @@ test("artists verse provides exact-credit rankings, individual history and daily
 });
 
 
+test("background sync runs Musicat every ten minutes and keeps other scrobble providers out", () => {
+  const workflow = readFileSync(new URL("../.github/workflows/sync-musicat.yml", import.meta.url), "utf8");
+  assert.match(workflow, /cron:\s*["']\*\/10 \* \* \* \*["']/);
+  assert.match(workflow, /functions\/v1\/spotify-sync/);
+  assert.doesNotMatch(workflow, /scrobble-sync|ListenBrainz|Last\.fm/);
+});
+
 test("public profile statistics never expose private Spotify or scrobble history", () => {
   const migration = readFileSync(new URL("../supabase/migrations/20261104150000_keep_spotify_history_private.sql", import.meta.url), "utf8");
   assert.match(migration, /create or replace function public\.get_public_profile/);
