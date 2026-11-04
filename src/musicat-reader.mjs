@@ -162,7 +162,8 @@ export async function collectMusicatHistorySince(page, since, options = {}) {
       const albumImage = artworkContainer?.querySelector("img") || rowImages.find(img => {
         const parent = img.parentElement;
         const description = [img.getAttribute("alt"), img.getAttribute("class"), img.getAttribute("data-testid"), parent?.getAttribute("class"), parent?.getAttribute("data-testid")].filter(Boolean).join(" ");
-        return /album|cover|artwork|playedmusic/i.test(description) || /i\\.scdn\\.co|spotifycdn/i.test(img.currentSrc || img.src || img.getAttribute("data-src") || "");
+        const imageUrl = img.currentSrc || img.src || img.getAttribute("data-src") || "";
+        return /album|cover|artwork|playedmusic/i.test(description) || imageUrl.includes("i.scdn.co") || imageUrl.includes("spotifycdn");
       }) || (rowImages.length === 1 ? rowImages[0] : null);
       const lazyImageUrl = albumImage?.currentSrc || albumImage?.src || albumImage?.getAttribute("data-src") || albumImage?.getAttribute("data-lazy-src") || albumImage?.getAttribute("data-original") || albumImage?.getAttribute("srcset")?.split(",")[0]?.trim()?.split(" ")[0] || artworkContainer?.querySelector("source[srcset]")?.getAttribute("srcset")?.split(",")[0]?.trim()?.split(" ")[0] || "";
       const backgroundNode = artworkContainer || [...row.querySelectorAll("[style]")].find(node => (node.getAttribute("style") || "").includes("background-image"));
