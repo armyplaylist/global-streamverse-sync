@@ -89,9 +89,10 @@ test("tracks page exposes individual song and album listening history without at
   assert.match(tracks, /detail:"track"/);
   assert.match(tracks, /detail:"album"/);
   assert.match(tracks, /album\.candidate\?null/);
-  const match = tracks.match(/<script>([\\s\\S]*?)<\\/script>/);
-  assert.ok(match, "tracks script should exist");
-  assert.doesNotThrow(() => new Script(match[1]), "tracks JavaScript should parse");
+  const scriptStart = tracks.indexOf("<script>") + "<script>".length;
+  const scriptEnd = tracks.indexOf("</script>", scriptStart);
+  assert.ok(scriptStart >= 8 && scriptEnd > scriptStart, "tracks script should exist");
+  assert.doesNotThrow(() => new Script(tracks.slice(scriptStart, scriptEnd)), "tracks JavaScript should parse");
 });
 
 test("tracks catalog edge function validates identifiers and limits history to Musicat aggregates", () => {
