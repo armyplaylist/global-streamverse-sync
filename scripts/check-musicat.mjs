@@ -121,8 +121,44 @@ try {
     throw new Error(`Some visible history rows were incomplete: ${validRows.length}/${rows.length} valid.`);
   }
 
+  const artworkDiagnostics = await page.evaluate(() => {
+    return [...document.querySelectorAll('time[datetime]')].slice(0, 5).map(time => {
+      const row = time.closest('div[class*="PlayedMusic_row"]');
+      if (!row) return { rowFound: false };
+      return {
+        rowClass: row.getAttribute("class") || "",
+        imageCount: row.querySelectorAll("img").length,
+        images: [...row.querySelectorAll("img")].slice(0, 5).map(img => ({
+          alt: img.getAttribute("alt"),
+          className: img.getAttribute("class"),
+          src: img.getAttribute("src"),
+          currentSrc: img.currentSrc,
+          dataSrc: img.getAttribute("data-src"),
+          srcset: img.getAttribute("srcset"),
+          parentClass: img.parentElement?.getAttribute("class") || ""
+        })),
+        artworkLikeNodes: [...row.querySelectorAll("[class], [data-testid], [aria-label], [title]")].filter(node =>
+          /album|cover|artwork|playedmusic/i.test([
+            node.getAttribute("class"),
+            node.getAttribute("data-testid"),
+            node.getAttribute("aria-label"),
+            node.getAttribute("title")
+          ].filter(Boolean).join(" "))
+        ).slice(0, 10).map(node => ({
+          tag: node.tagName,
+          className: node.getAttribute("class"),
+          testId: node.getAttribute("data-testid"),
+          ariaLabel: node.getAttribute("aria-label"),
+          title: node.getAttribute("title"),
+          text: (node.innerText || "").slice(0, 100)
+        }))
+      };
+    });
+  });
+
   console.log(JSON.stringify({
     status: "validated",
+    artworkDiagnostics,
     profile: parsed.pathname,
     historyTitle: await page.title(),
     visibleTimestampedRows: rows.length,
