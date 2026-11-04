@@ -122,6 +122,15 @@ test("artists verse provides exact-credit rankings, individual history and daily
   assert.doesNotThrow(() => new Script(tracks.slice(scriptStart, scriptEnd)), "artists JavaScript should parse");
 });
 
+
+test("public profile statistics never expose private Spotify or scrobble history", () => {
+  const migration = readFileSync(new URL("../supabase/migrations/20261104150000_keep_spotify_history_private.sql", import.meta.url), "utf8");
+  assert.match(migration, /create or replace function public\.get_public_profile/);
+  assert.match(migration, /where e\.provider = 'musicat'/);
+  assert.doesNotMatch(migration, /spotify_listening_events|scrobble_events/);
+  assert.match(migration, /Public profile history contains Musicat records only/);
+});
+
 test("statistics and catalog pages are read-only without outbound Spotify redirects or pending editions", () => {
   const app = readFileSync(new URL("../src.js", import.meta.url), "utf8");
   const tracks = readFileSync(new URL("../site/tracks.html", import.meta.url), "utf8");
