@@ -13,7 +13,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: global-streamverse-musicat-sync
+  group: global-streamverse-musicat-sync-v2
   cancel-in-progress: false
 
 jobs:
