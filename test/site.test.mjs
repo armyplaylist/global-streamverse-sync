@@ -79,3 +79,27 @@ test("React profile preserves private auth, editable identity, Spotify and scrob
   assert.match(app, /Conectar Last\.fm/);
   assert.match(app, /musicat_sync_requests/);
 });
+
+test("tracks page exposes individual song and album listening history without attributing candidate editions", () => {
+  const tracks = readFileSync(new URL("../site/tracks.html", import.meta.url), "utf8");
+  assert.match(tracks, /id="trackDetail"/);
+  assert.match(tracks, /data-track-id/);
+  assert.match(tracks, /openTrackHistory/);
+  assert.match(tracks, /loadAlbumHistory/);
+  assert.match(tracks, /detail:"track"/);
+  assert.match(tracks, /detail:"album"/);
+  assert.match(tracks, /album\.candidate\?null/);
+  const scriptStart = tracks.indexOf("<script>") + "<script>".length;
+  const scriptEnd = tracks.indexOf("</script>", scriptStart);
+  assert.ok(scriptStart >= 8 && scriptEnd > scriptStart, "tracks script should exist");
+  assert.doesNotThrow(() => new Script(tracks.slice(scriptStart, scriptEnd)), "tracks JavaScript should parse");
+});
+
+test("tracks catalog edge function validates identifiers and limits history to Musicat aggregates", () => {
+  const edge = readFileSync(new URL("../supabase/functions/tracks-catalog/index.ts", import.meta.url), "utf8");
+  assert.match(edge, /loadHistoryDetail/);
+  assert.match(edge, /provider=eq\.musicat/);
+  assert.match(edge, /Invalid Musicat track id/);
+  assert.match(edge, /Invalid album reference/);
+  assert.match(edge, /streams_365d/);
+});
