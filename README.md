@@ -45,3 +45,13 @@ No song, album, or artist rankings are produced by this project.
 - The Python endpoint reads only the public, consented directory via the `get_public_profiles` and `get_public_profile` RPCs. It does not use a service-role or Supabase secret key.
 - The analytics endpoint caches responses briefly and labels the track list as a recent sample (up to 50 latest events per public profile), not an all-time track ranking.
 - Vercel uses the lightweight root `requirements.txt`; the separate Streamlit admin app keeps its own dependencies in `admin/requirements.txt`.
+
+
+### Python catalog analytics
+
+- `api/catalog.py` exposes `/api/catalog`, which securely proxies the existing `tracks-catalog` Supabase Edge Function and adds album totals, top songs, and candidate album summaries.
+- The public Tracks page now reads the catalog through this Python endpoint; the Spotify client secret remains inside Supabase Edge Function secrets.
+- The React **Estadísticas** page combines the public-profile summary endpoint with Python's catalog rankings.
+- Confirmed album totals include only songs with a unique Spotify match. Candidate releases remain separate and receive no attributed plays.
+- The API keeps a short in-memory cache to avoid repeatedly triggering catalog enrichment.
+- The latest deployment is a Vercel preview; the production domain has not been reassigned.
