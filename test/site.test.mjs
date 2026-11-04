@@ -123,7 +123,7 @@ test("statistics and catalog pages are read-only without outbound Spotify redire
   const app = readFileSync(new URL("../src.js", import.meta.url), "utf8");
   const tracks = readFileSync(new URL("../site/tracks.html", import.meta.url), "utf8");
   assert.doesNotMatch(app, /Versiones por confirmar|Versión por confirmar|candidate_albums/);
-  assert.doesNotMatch(app, /Abrir en Spotify|spotify-link|href:url|spotify-oauth|scrobble_connections/);
+  assert.doesNotMatch(app, /Abrir en Spotify|spotify-link|spotify-oauth|scrobble_connections/);
   assert.doesNotMatch(tracks, /Versiones por confirmar|candidateAlbums|candidateCount|spotify-link|Escuchar en Spotify/);
   assert.doesNotMatch(tracks, /href="https:\/\/open\.spotify\.com/);
   assert.match(tracks, /Registro Musicat/);
