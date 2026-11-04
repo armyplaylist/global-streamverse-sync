@@ -21,16 +21,16 @@
 <body>
 <header><div class="wrap nav"><a class="brand" href="/">GLOBAL <span>STREAMVERSE</span></a><a class="btn" href="/">Volver al inicio</a></div></header>
 <main class="wrap">
-<section class="hero"><div class="eyebrow">Global song charts</div><h1>TRACKS <span style="color:#7952c7">VERSE</span></h1><p>Un recuento colectivo de las canciones registradas por GLOBAL STREAMVERSE. Cada reproducción procede del historial de Musicat de los participantes; Spotify aporta la información musical y las portadas.</p></section>
+<section class="hero"><div class="eyebrow">Global song charts</div><h1>TRACKS <span style="color:#7952c7">VERSE</span></h1></section>
 <section class="summary"><article class="stat"><small>Reproducciones registradas</small><strong id="total">—</strong></article><article class="stat"><small>Canciones identificadas</small><strong id="identified">—</strong></article><article class="stat"><small>Canciones en catálogo</small><strong id="songsCount">—</strong></article></section>
 <div class="view-tabs" role="group" aria-label="Tipo de catálogo"><button class="view-tab active" data-view="tracks">Canciones</button><button class="view-tab" data-view="albums">Álbumes</button></div>
 <section class="toolbar"><div class="periods" role="group" aria-label="Periodo"><button class="period active" data-period="total">Total</button><button class="period" data-period="today">Hoy</button><button class="period" data-period="week">7 días</button><button class="period" data-period="month">Mes</button></div><input class="search" id="search" type="search" placeholder="Buscar álbum, canción o artista…" aria-label="Buscar álbum, canción o artista"><button class="refresh-catalog" id="refreshCatalog" type="button">↻ Actualizar</button></section>
 <p class="meta" id="meta">Cargando recuento global…</p>
 <section class="songs" id="songs"><div class="empty">Preparando el catálogo de canciones…</div></section>
 <section id="albumDetail" hidden></section>
-<section class="album-section" id="albums" hidden><div><h2>Álbumes del catálogo</h2><p>Una sola portada por lanzamiento. Las asociaciones provienen del catálogo de Spotify y no confirman por sí solas qué edición se reprodujo.</p><div class="album-grid" id="confirmedAlbums"></div></div><div><h2>Versiones por confirmar</h2><p>Incluye lanzamientos candidatos de canciones con más de una coincidencia. No se les asignan reproducciones hasta identificar la edición correcta.</p><div class="album-grid" id="candidateAlbums"></div></div></section>\n
+<section class="album-section" id="albums" hidden><div><h2>Álbumes del catálogo</h2><div class="album-grid" id="confirmedAlbums"></div></div><div><h2>Versiones por confirmar <span id="candidateCount" class="album-badge">0</span></h2><div class="album-grid" id="candidateAlbums"></div></div></section>\n
 <p class="status" id="status" aria-live="polite"></p>
-<p class="foot">Las portadas, los nombres de álbumes y los enlaces de catálogo se atribuyen a <a href="https://www.spotify.com/" target="_blank" rel="noopener">Spotify</a>. Las imágenes se muestran en su formato original y enlazan al contenido correspondiente. GLOBAL STREAMVERSE es un proyecto independiente de fans, no afiliado a Spotify, BTS ni HYBE. Los recuentos reflejan únicamente las reproducciones que Musicat hizo disponibles y que GLOBAL STREAMVERSE pudo registrar.</p>
+<p class="foot">Reproducciones: Musicat · Portadas y metadatos: Spotify.</p>
 </main><nav class="bottom-dock" aria-label="Navegación principal">
 <a class="dock-link" href="/" aria-label="Inicio"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg><span>Inicio</span></a>
 <a class="dock-link active" href="/tracks.html" aria-label="Canciones"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg><span>Canciones</span></a>
@@ -67,9 +67,10 @@ function renderTracks(rows){
 let albumCollections=[];
 function albumCard(album,index,candidate=false){
  const image=album.image?'<img class="album-cover" src="'+esc(album.image)+'" alt="Portada de '+esc(album.name)+'" loading="lazy">':'<div class="album-cover placeholder">♫</div>';
- const badge=candidate?"Versión por confirmar":"Lanzamiento del catálogo Spotify";
+ const badge=candidate?"Por confirmar":"En catálogo";
+ const sourceTracks=candidate?[...new Set((album.rows||[]).map(r=>r.track_name+" · "+r.artist_name))].join(", "):"";
  const playcount=candidate?'<span class="album-playcount">— <small>sin atribución</small></span>':'<span class="album-playcount"><strong>'+fmt(album.streamTotal||0)+'</strong><small>reproducciones</small></span>';
- return '<button type="button" class="album-card'+(candidate?' candidate':'')+'" data-album-index="'+index+'">'+image+'<span><span class="album-title">'+esc(album.name)+'</span><span class="album-sub">'+releaseType(album.type)+(album.releaseDate?" · "+esc(album.releaseDate):"")+'</span><span class="album-badge">'+badge+'</span></span>'+playcount+'<span class="album-arrow" aria-hidden="true">›</span></button>';
+ return '<button type="button" class="album-card'+(candidate?' candidate':'')+'" data-album-index="'+index+'">'+image+'<span><span class="album-title">'+esc(album.name)+'</span><span class="album-sub">'+releaseType(album.type)+(album.releaseDate?" · "+esc(album.releaseDate):"")+'</span>'+(candidate?'<span class="album-sub">Canción: '+esc(sourceTracks)+'</span>':'')+'<span class="album-badge">'+badge+'</span></span>'+playcount+'<span class="album-arrow" aria-hidden="true">›</span></button>';
 }
 function openAlbum(index){
  const album=albumCollections[index];if(!album)return;
@@ -102,7 +103,7 @@ function buildAlbums(term){
     const key=item.album_uri||("name:"+String(item.album_name).toLowerCase());
     if(confirmed.has(key))continue;
     if(!candidates.has(key))candidates.set(key,{name:item.album_name,image:item.album_image_url,uri:item.album_uri,type:item.album_type,releaseDate:item.album_release_date,rows:[],candidate:true});
-    candidates.get(key).rows.push(row);
+    if(!candidates.get(key).rows.some(existing=>String(existing.musicat_track_id||existing.track_name)===String(row.musicat_track_id||row.track_name)))candidates.get(key).rows.push(row);
    }
   }
  }
@@ -110,6 +111,8 @@ function buildAlbums(term){
  const known=[...confirmed.values()].filter(matches).sort((a,b)=>b.streamTotal-a.streamTotal||a.name.localeCompare(b.name));
  const possible=[...candidates.values()].filter(matches).sort((a,b)=>a.name.localeCompare(b.name));
  albumCollections=[...known,...possible];
+ document.getElementById("candidateCount").textContent=String(possible.length);
+ document.getElementById("meta").textContent=known.length+" álbumes · "+possible.length+" versiones por confirmar";
  document.getElementById("confirmedAlbums").innerHTML=known.length?known.map((a,i)=>albumCard(a,i,false)).join(""):'<div class="empty album-empty">Todavía no hay álbumes con coincidencia única en el catálogo.</div>';
  document.getElementById("candidateAlbums").innerHTML=possible.length?possible.map((a,i)=>albumCard(a,known.length+i,true)).join(""):'<div class="empty album-empty">No hay versiones candidatas pendientes con esta búsqueda.</div>';
  document.getElementById("confirmedAlbums").querySelectorAll("[data-album-index]").forEach(b=>b.addEventListener("click",()=>openAlbum(Number(b.dataset.albumIndex))));
@@ -122,8 +125,7 @@ function render(){
  document.getElementById("total").textContent=fmt(total);
  document.getElementById("identified").textContent=fmt(allRows.filter(r=>r.match_status==="matched").length);
  document.getElementById("songsCount").textContent=fmt(allRows.length);
- const periodText=period==="total"?"acumuladas":period==="today"?"de hoy":period==="week"?"de los últimos 7 días":"del mes";
- document.getElementById("meta").textContent=activeView==="tracks"?rows.length+" canciones · ordenadas por reproducciones "+periodText+" · reinicio diario 00:00 UTC.": "Catálogo de álbumes y versiones · una portada por lanzamiento · sin atribuir streams a ediciones no confirmadas.";
+ document.getElementById("meta").textContent=activeView==="tracks"?rows.length+" canciones":"";
  document.getElementById("songs").hidden=activeView!=="tracks";
  document.getElementById("albums").hidden=activeView!=="albums";document.getElementById("albumDetail").hidden=true;
  document.querySelector(".periods").style.display=activeView==="tracks"?"flex":"none";
