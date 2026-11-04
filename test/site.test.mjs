@@ -126,6 +126,7 @@ test("artists verse provides exact-credit rankings, individual history and daily
 test("background sync runs Musicat every ten minutes and keeps other scrobble providers out", () => {
   const workflow = readFileSync(new URL("../.github/workflows/sync-musicat.yml", import.meta.url), "utf8");
   assert.match(workflow, /cron:\s*["']\*\/10 \* \* \* \*["']/);
+  assert.match(workflow, /run: npm ci --ignore-scripts/);
   assert.match(workflow, /functions\/v1\/spotify-sync/);
   assert.doesNotMatch(workflow, /scrobble-sync|ListenBrainz|Last\.fm/);
 });
