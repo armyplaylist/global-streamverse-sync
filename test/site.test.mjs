@@ -73,7 +73,10 @@ test("React profile keeps private auth and Musicat-only read-only statistics", (
   assert.match(app, /identity\(\{\.\.\.person,\.\.\.mine\}\)/);
   assert.match(app, /window\.location\.href="\/#access"/);
   assert.doesNotMatch(app, /Editar perfil|Actualizar Musicat|Conectar con Spotify|Conectar ListenBrainz|Conectar Last\.fm/);
-  assert.doesNotMatch(app, /className:"profile-spotify"|className:"profile-scrobbles"/);
+  assert.match(app, /const spotifySection=!publicView\?/);
+  assert.match(app, /spotify-oauth/);
+  assert.match(app, /get_my_spotify_monthly_stats/);
+  assert.match(app, /spotifySection,/);
 });
 
 test("tracks page exposes individual song and album listening history without attributing candidate editions", () => {
@@ -123,7 +126,8 @@ test("statistics and catalog pages are read-only without outbound Spotify redire
   const app = readFileSync(new URL("../src.js", import.meta.url), "utf8");
   const tracks = readFileSync(new URL("../site/tracks.html", import.meta.url), "utf8");
   assert.doesNotMatch(app, /Versiones por confirmar|Versión por confirmar|candidate_albums/);
-  assert.doesNotMatch(app, /Abrir en Spotify|spotify-link|spotify-oauth|scrobble_connections/);
+  const publicApp = app.slice(0, app.indexOf("function Profile()"));
+  assert.doesNotMatch(publicApp, /Abrir en Spotify|spotify-link|spotify-oauth|scrobble_connections/);
   assert.doesNotMatch(tracks, /Versiones por confirmar|candidateAlbums|candidateCount|spotify-link|Escuchar en Spotify/);
   assert.doesNotMatch(tracks, /href="https:\/\/open\.spotify\.com/);
   assert.match(tracks, /Registro Musicat/);
