@@ -55,3 +55,7 @@ No song, album, or artist rankings are produced by this project.
 - Confirmed album totals include only songs with a unique Spotify match. Candidate releases remain separate and receive no attributed plays.
 - The API keeps a short in-memory cache to avoid repeatedly triggering catalog enrichment.
 - The latest deployment is a Vercel preview; the production domain has not been reassigned.
+
+
+- The React app now renders the Tracks and Albums views directly from `/api/catalog`, including period filters, search, album details, confirmed releases, and a separate candidate-release list.
+- The existing homepage and profile are still served in the compatibility iframe while those screens are migrated.
