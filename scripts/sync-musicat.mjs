@@ -178,6 +178,7 @@ async function importEvents(participant, events) {
     dedupe_key: musicatDedupeKey(event),
     artist: event.artist,
     track: event.title,
+    album: event.album || null,
     played_at: event.playedAt
   }));
 
@@ -191,6 +192,21 @@ async function importEvents(participant, events) {
       body: batch
     });
     totalInserted += Array.isArray(inserted) ? inserted.length : 0;
+  }
+
+  // Backfill album labels on overlapping history rows without erasing a label
+  // already captured when Musicat omits album metadata on another render.
+  for (const event of events) {
+    if (!event.album) continue;
+    await supabaseRequest(
+      "stream_events?participant_id=eq." + encodeURIComponent(participant.id)
+        + "&dedupe_key=eq." + encodeURIComponent(musicatDedupeKey(event)),
+      {
+        method: "PATCH",
+        prefer: "return=minimal",
+        body: { album: event.album }
+      }
+    );
   }
   return totalInserted;
 }
