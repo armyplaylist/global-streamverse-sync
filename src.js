@@ -42,7 +42,7 @@ function Analytics(){
     ]),
     h("section",{className:"columns"},
      h("article",{className:"panel"},h("div",{className:"panel-head"},h("h2",null,"Canciones populares"),h("span",null,"Reproducciones de hoy")),h("div",{className:"rows"},tracks.slice(0,8).map((r,i)=>item(r.track_name,r.artist_name,r.today_streams,i,r.album_image_url)))),
-     h("article",{className:"panel"},h("div",{className:"panel-head"},h("h2",null,"Álbumes destacados"),h("span",null,"Reproducciones de hoy")),h("div",{className:"rows"},albums.slice(0,8).map((a,i)=>item(a.name,a.tracks+" canciones",a.today,i,a.image)))
+     h("article",{className:"panel"},h("div",{className:"panel-head"},h("h2",null,"Álbumes destacados"),h("span",null,"Reproducciones de hoy")),h("div",{className:"rows"},albums.slice(0,8).map((a,i)=>item(a.name,a.tracks+" canciones",a.today,i,a.image))))
     ),
     h("section",{className:"columns"},
      h("article",{className:"panel"},h("div",{className:"panel-head"},h("h2",null,"Top ARMY"),h("span",null,"Perfiles públicos")),h("div",{className:"rows"},(data.top_members||[]).slice(0,8).map((m,i)=>item(m.display_name+" · @"+m.handle,m.country_code,m.total_streams,i)))),
