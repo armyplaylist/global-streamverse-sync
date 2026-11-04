@@ -167,7 +167,7 @@ export async function collectMusicatHistorySince(page, since, options = {}) {
       const lazyImageUrl = albumImage?.currentSrc || albumImage?.src || albumImage?.getAttribute("data-src") || albumImage?.getAttribute("data-lazy-src") || albumImage?.getAttribute("data-original") || albumImage?.getAttribute("srcset")?.split(",")[0]?.trim()?.split(" ")[0] || artworkContainer?.querySelector("source[srcset]")?.getAttribute("srcset")?.split(",")[0]?.trim()?.split(" ")[0] || "";
       const backgroundNode = artworkContainer || [...row.querySelectorAll("[style]")].find(node => (node.getAttribute("style") || "").includes("background-image"));
       const backgroundValue = backgroundNode ? getComputedStyle(backgroundNode).backgroundImage : "";
-      const backgroundUrl = backgroundValue.match(/url\\(["\']?(.*?)["\']?\\)/i)?.[1] || "";
+      const backgroundUrl = backgroundValue.startsWith("url(") ? backgroundValue.slice(backgroundValue.indexOf("(") + 1, backgroundValue.lastIndexOf(")")).replaceAll('"', "").replaceAll("'", "") : "";
       const albumCoverUrl = lazyImageUrl || backgroundUrl;
       const album = [
         albumLink?.innerText?.trim(),
