@@ -32,7 +32,7 @@ test("shows public nickname and country flag directory, not account credentials"
   assert.match(html, /m\.handle/);
   assert.doesNotMatch(html, /participant_directory\?select=[^"`]*\b(?:login_username|password|provider_username|public_profile_url)\b/i);
   assert.match(html, /name\.textContent=m\.display_name/);
-  assert.match(html, /country\.textContent=COUNTRY_NAMES\[m\.country_code\]/);
+  assert.match(html, /country\.textContent=\(COUNTRY_NAMES\[m\.country_code\]\|\|m\.country_code\)/);
 });
 
 test("shows the professional country ranking dashboard with live stream data", () => {
