@@ -134,7 +134,7 @@ function render(){
 async function load(){
  const status=document.getElementById("status");
  try{
-  const response=await fetch(endpoint+"?limit=250",{headers:{apikey:SUPABASE_KEY}});
+  const response=await fetch("/api/catalog",{headers:{Accept:"application/json"}});
   const data=await response.json();
   if(!response.ok)throw new Error(data.error||"No se pudo cargar el catálogo.");
   allRows=Array.isArray(data.rows)?data.rows:[];
