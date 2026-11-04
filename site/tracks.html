@@ -12,10 +12,7 @@
 .versions{display:grid;gap:6px;margin-top:8px}.version{display:flex;align-items:center;gap:8px;padding:7px;border:1px solid #eee8f5;border-radius:10px;background:#fbfaff}.version img{width:38px;height:38px;border-radius:6px;object-fit:cover}.version a{color:#5f478c;text-decoration:none;font-size:11px;font-weight:800}.version small{display:block;color:#827991;font-size:10px;font-weight:500}.track-details{font-size:10px;color:#8a8298;margin-top:5px;line-height:1.4}.versions-title{font-size:10px;color:#6e5597;font-weight:850;margin-top:8px}.observed-label{font-size:9px;color:#6e5597;line-height:1.25;margin-top:4px}.observed-covers{margin-top:8px}.observed-covers span{display:block;font-size:9px;color:#6e5597;font-weight:800;margin-bottom:4px}.observed-covers>div{display:flex;gap:5px;flex-wrap:wrap}.observed-covers img{width:34px;height:34px;border-radius:6px;object-fit:cover;border:1px solid #eee8f5}
 
 .view-tabs{display:flex;gap:8px;margin:18px 0 12px}.view-tab{border:1px solid #ded5ea;background:#fff;color:#5c526d;border-radius:11px;padding:10px 16px;font-weight:850;cursor:pointer}.view-tab.active{background:#e9defb;border-color:#a98bdb;color:#4e347c}
-.album-section{display:grid;gap:22px}.album-section h2{font-size:18px;margin:4px 0 2px}.album-section p{color:#81778f;font-size:12px;margin:0 0 8px}.album-grid{display:grid;grid-template-columns:1fr;gap:0}.album-card{background:#fff;border:1px solid var(--line);border-radius:0;padding:12px 14px;box-shadow:none;display:grid;grid-template-columns:64px minmax(0,1fr);gap:13px;align-items:center;border-bottom:0}.album-card:first-child{border-radius:14px 14px 0 0}.album-card:last-child{border-bottom:1px solid var(--line);border-radius:0 0 14px 14px}.album-cover{width:64px;height:64px;object-fit:cover;border-radius:9px;background:#f1edf6;border:1px solid #eee8f5}.album-title{font-size:14px;font-weight:900;line-height:1.25}.album-sub{font-size:11px;color:#81778f;margin-top:4px;line-height:1.4}.album-tracklist{font-size:11px;color:#6f667e;margin-top:6px;line-height:1.45}.album-badge{display:inline-block;margin-top:6px;padding:4px 7px;border-radius:7px;background:#f2edf9;color:#6e5597;font-size:9px;font-weight:850}.album-empty{grid-column:1/-1}.album-card.candidate{border-left:3px dashed #b9a4d8;background:#fdfcff}
-@media(max-width:600px){.album-card{grid-template-columns:58px minmax(0,1fr);padding:11px 10px;gap:11px}.album-cover{width:58px;height:58px}.view-tabs{margin-top:14px}}
-
-@media(max-width:600px){.summary{gap:7px}.stat{padding:11px 9px}.stat strong{font-size:20px}.song{grid-template-columns:64px minmax(0,1fr) auto;gap:10px;padding:10px}.cover{width:64px;height:64px}.count{min-width:74px}.count strong{font-size:18px}.count small{font-size:9px}.toolbar{align-items:stretch}.search{max-width:none;width:100%}}
+.album-section{display:grid;gap:22px}.album-section h2{font-size:18px;margin:4px 0 2px}.album-section p{color:#81778f;font-size:12px;margin:0 0 8px}.album-grid{display:grid;grid-template-columns:1fr;gap:0}.album-card{width:100%;text-align:left;color:inherit;font:inherit;background:#fff;border:1px solid var(--line);border-radius:0;padding:12px 14px;box-shadow:none;display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:13px;align-items:center;border-bottom:0;cursor:pointer}.album-card:first-child{border-radius:14px 14px 0 0}.album-card:last-child{border-bottom:1px solid var(--line);border-radius:0 0 14px 14px}.album-card:active{background:#f8f5fc}.album-cover{width:64px;height:64px;object-fit:cover;border-radius:9px;background:#f1edf6;border:1px solid #eee8f5}.album-title{font-size:14px;font-weight:900;line-height:1.25}.album-sub{font-size:11px;color:#81778f;margin-top:4px;line-height:1.4}.album-badge{display:inline-block;margin-top:6px;padding:4px 7px;border-radius:7px;background:#f2edf9;color:#6e5597;font-size:9px;font-weight:850}.album-empty{grid-column:1/-1}.album-card.candidate{border-left:3px dashed #b9a4d8;background:#fdfcff}.album-arrow{font-size:20px;color:#8b7a9f}.album-detail-head{display:flex;align-items:center;gap:12px;margin-bottom:16px}.album-back{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 12px;font-weight:800;color:var(--ink);cursor:pointer}.album-detail-title{font-size:19px;font-weight:900;margin:0}.album-detail-cover{width:100%;max-width:180px;aspect-ratio:1;object-fit:cover;border-radius:14px;margin:0 auto 12px;display:block}.album-detail-summary{text-align:center;margin-bottom:18px}.album-detail-summary .album-sub{max-width:480px;margin:6px auto}.album-track-row{display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:10px;align-items:center;padding:12px;border-bottom:1px solid var(--line);background:#fff}.album-track-row:first-child{border-radius:13px 13px 0 0}.album-track-row:last-child{border-bottom:0;border-radius:0 0 13px 13px}.album-track-num{color:#9a91a5;font-size:12px;text-align:center}.album-track-name{font-size:13px;font-weight:850}.album-track-artist{font-size:11px;color:#81778f;margin-top:3px}.album-track-count{text-align:right;white-space:nowrap}.album-track-count strong{display:block;font-size:16px}.album-track-count small{font-size:9px;color:#81778f}@media(max-width:600px){.album-card{grid-template-columns:58px minmax(0,1fr) auto;padding:11px 10px;gap:11px}.album-cover{width:58px;height:58px}.view-tabs{margin-top:14px}.album-track-row{grid-template-columns:28px minmax(0,1fr) auto;padding:10px 8px}}@media(max-width:600px){.summary{gap:7px}.stat{padding:11px 9px}.stat strong{font-size:20px}.song{grid-template-columns:64px minmax(0,1fr) auto;gap:10px;padding:10px}.cover{width:64px;height:64px}.count{min-width:74px}.count strong{font-size:18px}.count small{font-size:9px}.toolbar{align-items:stretch}.search{max-width:none;width:100%}}
 .bottom-dock{position:fixed;z-index:50;left:50%;bottom:max(12px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(540px,calc(100% - 28px));display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:8px;background:rgba(255,255,255,.94);border:1px solid #e6def0;border-radius:22px;box-shadow:0 12px 38px #30234220;backdrop-filter:blur(18px)}.dock-link{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:48px;color:#81778f;text-decoration:none;font-size:10px;font-weight:750;border-radius:14px}.dock-link svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.dock-link.active,.dock-link:hover{color:#7952c7;background:#f1eafa}body{padding-bottom:100px}html{scroll-padding-top:24px}@media(min-width:760px){.bottom-dock{bottom:18px}}</style>
 </head>
 <body>
@@ -27,7 +24,7 @@
 <section class="toolbar"><div class="periods" role="group" aria-label="Periodo"><button class="period active" data-period="total">Total</button><button class="period" data-period="today">Hoy</button><button class="period" data-period="week">7 días</button><button class="period" data-period="month">Mes</button></div><input class="search" id="search" type="search" placeholder="Buscar canción o artista…" aria-label="Buscar canción o artista"></section>
 <p class="meta" id="meta">Cargando recuento global…</p>
 <section class="songs" id="songs"><div class="empty">Preparando el catálogo de canciones…</div></section>
-<section class="album-section" id="albums" hidden><div><h2>Álbumes del catálogo</h2><p>Una sola portada por lanzamiento. Las asociaciones provienen del catálogo de Spotify y no confirman por sí solas qué edición se reprodujo.</p><div class="album-grid" id="confirmedAlbums"></div></div><div><h2>Versiones por confirmar</h2><p>Incluye lanzamientos candidatos de canciones con más de una coincidencia. No se les asignan reproducciones hasta identificar la edición correcta.</p><div class="album-grid" id="candidateAlbums"></div></div></section>
+<section class="album-section" id="albums" hidden><div><h2>Álbumes del catálogo</h2><p>Una sola portada por lanzamiento. Las asociaciones provienen del catálogo de Spotify y no confirman por sí solas qué edición se reprodujo.</p><div class="album-grid" id="confirmedAlbums"></div></div><div><h2>Versiones por confirmar</h2><p>Incluye lanzamientos candidatos de canciones con más de una coincidencia. No se les asignan reproducciones hasta identificar la edición correcta.</p><div class="album-grid" id="candidateAlbums"></div></div></section>\n<section id="albumDetail" hidden></section>
 <p class="status" id="status" aria-live="polite"></p>
 <p class="foot">Las portadas, los nombres de álbumes y los enlaces de catálogo se atribuyen a <a href="https://www.spotify.com/" target="_blank" rel="noopener">Spotify</a>. Las imágenes se muestran en su formato original y enlazan al contenido correspondiente. GLOBAL STREAMVERSE es un proyecto independiente de fans, no afiliado a Spotify, BTS ni HYBE. Los recuentos reflejan únicamente las reproducciones que Musicat hizo disponibles y que GLOBAL STREAMVERSE pudo registrar.</p>
 </main><nav class="bottom-dock" aria-label="Navegación principal">
@@ -63,37 +60,52 @@ function renderTracks(rows){
   return '<article class="song">'+cover+'<div class="song-main"><div class="rank">#'+(i+1)+'</div><div class="song-title">'+esc(r.track_name)+'</div><div class="artist">'+esc(r.artist_name)+'</div><div class="album">'+album+'</div>'+(details?'<div class="track-details">'+esc(details)+'</div>':"")+coverNote+'<span class="tag">'+tag+'</span><br>'+link+'</div><div class="count"><strong>'+fmt(countFor(r))+'</strong><small>reproducciones</small></div></article>';
  }).join("");
 }
-function albumCard(album,candidate=false){
- const tracks=[...new Set(album.tracks||[])];
+let albumCollections=[];
+function albumCard(album,index,candidate=false){
  const image=album.image?'<img class="album-cover" src="'+esc(album.image)+'" alt="Portada de '+esc(album.name)+'" loading="lazy">':'<div class="album-cover placeholder">♫</div>';
- const trackText=tracks.length?tracks.map(esc).join(" · "):"Sin canciones relacionadas";
  const badge=candidate?"Versión por confirmar":"Lanzamiento del catálogo Spotify";
- const note=candidate?"No se asignan reproducciones hasta confirmar la edición escuchada.":"La portada identifica el lanzamiento; no confirma por sí sola la edición reproducida.";
- return '<article class="album-card'+(candidate?' candidate':'')+'">'+image+'<div><div class="album-title">'+esc(album.name)+'</div><div class="album-sub">'+releaseType(album.type)+(album.releaseDate?" · "+esc(album.releaseDate):"")+'</div><div class="album-tracklist"><strong>Canciones:</strong> '+trackText+'</div><span class="album-badge">'+badge+'</span><div class="album-sub">'+note+'</div></div></article>';
+ return '<button type="button" class="album-card'+(candidate?' candidate':'')+'" data-album-index="'+index+'">'+image+'<span><span class="album-title">'+esc(album.name)+'</span><span class="album-sub">'+releaseType(album.type)+(album.releaseDate?" · "+esc(album.releaseDate):"")+'</span><span class="album-badge">'+badge+'</span></span><span class="album-arrow" aria-hidden="true">›</span></button>';
+}
+function openAlbum(index){
+ const album=albumCollections[index];if(!album)return;
+ const detail=document.getElementById("albumDetail");
+ const rows=album.rows||[];
+ const image=album.image?'<img class="album-detail-cover" src="'+esc(album.image)+'" alt="Portada de '+esc(album.name)+'">':'';
+ const tracks=rows.map((r,i)=>{
+  const count=album.candidate?null:countFor(r);
+  return '<div class="album-track-row"><span class="album-track-num">'+(i+1)+'</span><div><div class="album-track-name">'+esc(r.track_name)+'</div><div class="album-track-artist">'+esc(r.artist_name)+'</div></div><div class="album-track-count">'+(count===null?'<strong>—</strong><small>Sin atribución</small>':'<strong>'+fmt(count)+'</strong><small>reproducciones</small>')+'</div></div>';
+ }).join("");
+ detail.innerHTML='<div class="album-detail-head"><button class="album-back" id="backToAlbums">← Álbumes</button></div><div class="album-detail-summary">'+image+'<h2 class="album-detail-title">'+esc(album.name)+'</h2><div class="album-sub">'+releaseType(album.type)+(album.releaseDate?" · "+esc(album.releaseDate):"")+'</div><div class="album-sub">'+(album.candidate?'Edición candidata: todavía no se atribuyen streams a este lanzamiento.':'Streams mostrados por canción; la asociación del catálogo no confirma la edición exacta escuchada.')+'</div></div><div class="album-grid">'+(tracks||'<div class="empty">No hay canciones relacionadas.</div>')+'</div>';
+ document.getElementById("albums").hidden=true;detail.hidden=false;
+ document.getElementById("backToAlbums").addEventListener("click",()=>{detail.hidden=true;document.getElementById("albums").hidden=false;});
+ window.scrollTo({top:0,behavior:"smooth"});
 }
 function buildAlbums(term){
  const confirmed=new Map(),candidates=new Map();
  for(const row of allRows){
   if(row.match_status==="matched"&&row.album_name&&row.album_image_url){
    const key=row.album_uri||("name:"+String(row.album_name).toLowerCase());
-   if(!confirmed.has(key))confirmed.set(key,{name:row.album_name,image:row.album_image_url,uri:row.album_uri,type:row.album_type,releaseDate:row.album_release_date,tracks:[]});
-   confirmed.get(key).tracks.push(row.track_name);
+   if(!confirmed.has(key))confirmed.set(key,{name:row.album_name,image:row.album_image_url,uri:row.album_uri,type:row.album_type,releaseDate:row.album_release_date,rows:[],candidate:false});
+   confirmed.get(key).rows.push(row);
   }
   if(row.match_status==="ambiguous"&&Array.isArray(row.spotify_candidates)){
    for(const item of row.spotify_candidates){
     if(!item.album_name||!item.album_image_url)continue;
     const key=item.album_uri||("name:"+String(item.album_name).toLowerCase());
-    if(confirmed.has(key)){confirmed.get(key).tracks.push(row.track_name+" · por confirmar");continue;}
-    if(!candidates.has(key))candidates.set(key,{name:item.album_name,image:item.album_image_url,uri:item.album_uri,type:item.album_type,releaseDate:item.album_release_date,tracks:[]});
-    candidates.get(key).tracks.push(row.track_name);
+    if(confirmed.has(key))continue;
+    if(!candidates.has(key))candidates.set(key,{name:item.album_name,image:item.album_image_url,uri:item.album_uri,type:item.album_type,releaseDate:item.album_release_date,rows:[],candidate:true});
+    candidates.get(key).rows.push(row);
    }
   }
  }
- const matches=a=>(a.name+" "+(a.tracks||[]).join(" ")).toLowerCase().includes(term);
+ const matches=a=>(a.name+" "+a.rows.map(r=>r.track_name).join(" ")).toLowerCase().includes(term);
  const known=[...confirmed.values()].filter(matches).sort((a,b)=>a.name.localeCompare(b.name));
  const possible=[...candidates.values()].filter(matches).sort((a,b)=>a.name.localeCompare(b.name));
- document.getElementById("confirmedAlbums").innerHTML=known.length?known.map(a=>albumCard(a,false)).join(""):'<div class="empty album-empty">Todavía no hay álbumes con coincidencia única en el catálogo.</div>';
- document.getElementById("candidateAlbums").innerHTML=possible.length?possible.map(a=>albumCard(a,true)).join(""):'<div class="empty album-empty">No hay versiones candidatas pendientes con esta búsqueda.</div>';
+ albumCollections=[...known,...possible];
+ document.getElementById("confirmedAlbums").innerHTML=known.length?known.map((a,i)=>albumCard(a,i,false)).join(""):'<div class="empty album-empty">Todavía no hay álbumes con coincidencia única en el catálogo.</div>';
+ document.getElementById("candidateAlbums").innerHTML=possible.length?possible.map((a,i)=>albumCard(a,known.length+i,true)).join(""):'<div class="empty album-empty">No hay versiones candidatas pendientes con esta búsqueda.</div>';
+ document.getElementById("confirmedAlbums").querySelectorAll("[data-album-index]").forEach(b=>b.addEventListener("click",()=>openAlbum(Number(b.dataset.albumIndex))));
+ document.getElementById("candidateAlbums").querySelectorAll("[data-album-index]").forEach(b=>b.addEventListener("click",()=>openAlbum(Number(b.dataset.albumIndex))));
 }
 function render(){
  const term=document.getElementById("search").value.trim().toLowerCase();
@@ -105,7 +117,7 @@ function render(){
  const periodText=period==="total"?"acumuladas":period==="today"?"de hoy":period==="week"?"de los últimos 7 días":"del mes";
  document.getElementById("meta").textContent=activeView==="tracks"?rows.length+" canciones · ordenadas por reproducciones "+periodText+" · reinicio diario 00:00 UTC.": "Catálogo de álbumes y versiones · una portada por lanzamiento · sin atribuir streams a ediciones no confirmadas.";
  document.getElementById("songs").hidden=activeView!=="tracks";
- document.getElementById("albums").hidden=activeView!=="albums";
+ document.getElementById("albums").hidden=activeView!=="albums";document.getElementById("albumDetail").hidden=true;
  document.querySelector(".periods").style.display=activeView==="tracks"?"flex":"none";
  if(activeView==="tracks")renderTracks(rows);else buildAlbums(term);
 }
