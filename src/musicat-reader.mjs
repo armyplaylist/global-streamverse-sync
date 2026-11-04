@@ -148,7 +148,7 @@ export async function collectMusicatHistorySince(page, since, options = {}) {
       // Musicat's public history may expose album metadata through a link,
       // a labelled element, or accessible/data attributes depending on the row variant.
       const albumLink = [...row.querySelectorAll("a[href]")].find(link => {
-        try { return /\\/albums?\\//i.test(new URL(link.href, location.origin).pathname); }
+        try { return /\/albums?\//i.test(new URL(link.href, location.origin).pathname); }
         catch { return false; }
       });
       const albumNode = row.querySelector(
