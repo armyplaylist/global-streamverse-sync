@@ -133,6 +133,31 @@ function Home(){
  const total=countryRows.reduce((a,r)=>a+r.total_streams,0),leader=countryRows[0];
  const metric=(label,value,sub)=>h("article",{className:"home-metric",key:label},h("span",null,label),h("strong",null,fmt(value)),sub?h("small",null,sub):null);
  const status=account?.status==="approved"?"Perfil activado. Tu historial público de Musicat está conectado a la sincronización automática.":account?.status==="rejected"?"No pudimos validar el perfil de Musicat. Revisa que sea público y corresponda a tu cuenta.":account?.status==="paused"?"Tu participación está pausada.":"Estamos validando tu perfil de Musicat automáticamente. No necesitas aprobación manual.";
+
+ const renderRanking=()=>{
+  if(rankingState!=="ready")return h("div",{className:"home-empty"},rankingState==="loading"?"Consultando los totales…":"No pudimos cargar el ranking en este momento.");
+  if(!countryRows.length)return h("div",{className:"home-empty"},"Aún no hay reproducciones BTS verificadas. El ranking aparecerá cuando se sincronicen los perfiles.");
+  const bars=countryRows.slice(0,8).map((r,i)=>h("div",{className:"home-rank-row",key:r.country_code},
+   h("b",null,i+1+". "+flagFor(r.country_code)+" "+(COUNTRIES[r.country_code]||r.country_code)),
+   h("div",{className:"home-bar-track"},h("div",{className:"home-bar-fill",style:{width:(r.total_streams/leader.total_streams*100)+"%"}})),
+   h("strong",null,fmt(r.total_streams))
+  ));
+  const rows=countryRows.map((r,i)=>h("tr",{key:r.country_code},
+   h("td",null,i+1),
+   h("td",null,flagFor(r.country_code)+" "+(COUNTRIES[r.country_code]||r.country_code)),
+   h("td",null,fmt(r.total_streams))
+  ));
+  return h("div",{className:"home-panel"},
+   h("div",{className:"home-ranking-bars"},bars),
+   h("h3",null,"Tabla de posiciones"),
+   h("div",{className:"home-table-wrap"},
+    h("table",{className:"home-table"},
+     h("thead",null,h("tr",null,h("th",null,"Pos."),h("th",null,"País"),h("th",null,"Streams"))),
+     h("tbody",null,rows)
+    )
+   )
+  );
+ };
  return h("main",{className:"home-page"},
   h("section",{className:"home-hero"},h("div",{className:"eyebrow"},"ONE WORLD · ONE MUSIC COMMUNITY"),h("h1",null,"GLOBAL ",h("span",null,"STREAMVERSE")),h("p",null,"Unimos a ARMY de todo el mundo para reconocer el apoyo colectivo a BTS. Crea tu cuenta, comparte tu perfil público de Musicat y representa a tu país."),h("div",{className:"home-hero-actions"},h("a",{className:"home-primary",href:"#access"},"Participar"),h("a",{className:"home-secondary",href:"/analytics"},"Ver estadísticas"))),
   h("section",{className:"home-section"},h("div",{className:"home-heading"},h("div",null,h("div",{className:"eyebrow"},"MUSICAT TRACKING"),h("h2",null,"¿Cómo participar?"),h("p",null,"Por ahora, el registro y el recuento se basan en perfiles públicos de Musicat.")),h("span",{className:"home-pill"},"FUENTE ACTUAL: MUSICAT")),h("div",{className:"home-steps"},[["01 · CREA TU CUENTA","Usuario y contraseña","Elige un nombre de usuario y una contraseña para GLOBAL STREAMVERSE. No necesitas correo electrónico."],["02 · COMPLETA TU PERFIL","Nickname, país y Musicat","Elige cómo quieres aparecer, selecciona tu país y comparte el enlace público de Musicat."],["03 · PARTICIPA","Activación automática","El sistema valida el perfil público de Musicat y activa tu participación cuando el historial es accesible."]].map((x,i)=>h("article",{className:"home-step",key:i},h("small",null,x[0]),h("strong",null,x[1]),h("p",null,x[2])))),h("div",{className:"home-callout"},h("b",null,"Tu privacidad importa: "), "la contraseña que creas aquí solo sirve para GLOBAL STREAMVERSE; nunca pediremos tu contraseña de Musicat, Spotify ni Apple. En el directorio público solo aparecerán tu nickname elegido y tu país con bandera. Las reproducciones anteriores a tu incorporación no se cuentan.")),
@@ -147,7 +172,7 @@ function Home(){
   h("section",{className:"home-section"},h("div",{className:"home-heading"},h("div",null,h("div",{className:"eyebrow"},"OUR GLOBAL ARMY"),h("h2",null,"Army de todo el mundo"),h("p",null,"Nicknames elegidos por los participantes y sus banderas. Aparecen después de la validación automática.")),h("span",{className:"home-pill"},directoryState==="ready"?members.length+" ARMY":directoryState==="loading"?"CARGANDO":"NO DISPONIBLE")),directoryState==="ready"?(members.length?h("div",{className:"home-members"},members.map(m=>h("a",{className:"home-member",href:"/profile.html?u="+encodeURIComponent(m.handle),key:m.handle},h("span",{className:"home-flag"},flagFor(m.country_code)),h("span",null,h("b",null,m.display_name),h("small",null,"@"+m.handle),h("small",null,COUNTRIES[m.country_code]||m.country_code))))):h("div",{className:"home-empty"},"Aún no hay perfiles públicos activados.")):h("div",{className:"home-empty"},directoryState==="loading"?"Cargando participantes…":"No pudimos cargar el directorio en este momento.")),
   h("section",{className:"home-section",id:"ranking"},h("div",{className:"home-heading"},h("div",null,h("div",{className:"eyebrow"},"WORLDWIDE ANALYTICS"),h("h2",null,"🌎 Ranking global de streams BTS"),h("p",null,"Actividad diaria por país · datos verificados por GLOBAL STREAMVERSE.")),h("span",{className:"home-pill"},rankingState==="ready"?"ACTUALIZADO":rankingState==="loading"?"CARGANDO":"NO DISPONIBLE")),
    h("div",{className:"home-summary"},metric("Streams globales del día",total),metric("Países activos",countryRows.length),metric("País líder",leader?(COUNTRIES[leader.country_code]||leader.country_code):"—",leader?fmt(leader.total_streams)+" streams":"Sin actividad registrada")),
-   rankingState==="ready"?(countryRows.length?h("div",{className:"home-panel"},h("div",{className:"home-ranking-bars"},countryRows.slice(0,8).map((r,i)=>h("div",{className:"home-rank-row",key:r.country_code},h("b",null,i+1+". "+flagFor(r.country_code)+" "+(COUNTRIES[r.country_code]||r.country_code)),h("div",{className:"home-bar-track"},h("div",{className:"home-bar-fill",style:{width:(r.total_streams/leader.total_streams*100)+"%"}})),h("strong",null,fmt(r.total_streams)))),h("h3",null,"Tabla de posiciones"),h("div",{className:"home-table-wrap"},h("table",{className:"home-table"},h("thead",null,h("tr",null,h("th",null,"Pos."),h("th",null,"País"),h("th",null,"Streams"))),h("tbody",null,countryRows.map((r,i)=>h("tr",{key:r.country_code},h("td",null,i+1),h("td",null,flagFor(r.country_code)+" "+(COUNTRIES[r.country_code]||r.country_code)),h("td",null,fmt(r.total_streams)))))))):h("div",{className:"home-empty"},"Aún no hay reproducciones BTS verificadas. El ranking aparecerá cuando se sincronicen los perfiles.")):h("div",{className:"home-empty"},rankingState==="loading"?"Consultando los totales…":"No pudimos cargar el ranking en este momento."}),h("p",{className:"home-muted"},"Actualizado: "+updated+" · El día de seguimiento se calcula de 00:00 a 23:59 UTC.")),
+   renderRanking(),h("p",{className:"home-muted"},"Actualizado: "+updated+" · El día de seguimiento se calcula de 00:00 a 23:59 UTC.")),
   h("p",{className:"home-muted home-disclaimer"},"GLOBAL STREAMVERSE es un proyecto independiente de fans y no está afiliado a BTS, HYBE, Musicat, Spotify ni Apple Music. El país es autodeclarado; no utilizamos tu ubicación para asignarlo."),
   h("footer",{className:"home-footer"},"© 2026 GLOBAL STREAMVERSE · Music brings us together")
  );
