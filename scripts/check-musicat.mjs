@@ -1,4 +1,5 @@
 import { chromium } from "playwright";
+import { waitForMusicatUserId } from "../src/musicat-reader.mjs";
 
 const profileUrl = process.env.MUSICAT_PROFILE_URL;
 if (!profileUrl) {
@@ -25,27 +26,23 @@ try {
     waitUntil: "domcontentloaded",
     timeout: 60000
   });
-  await page.waitForTimeout(2500);
-
   if (!profileResponse?.ok()) {
     throw new Error(`Public profile returned HTTP ${profileResponse?.status() ?? "no response"}`);
   }
 
+  // Musicat is a client-rendered page. Wait for its public history link instead
+  // of assuming that the document body is hydrated after a fixed short delay.
+  const uuid = await waitForMusicatUserId(page, 25000);
   const profile = await page.evaluate(() => ({
     title: document.title,
-    visibleText: document.body?.innerText || "",
+    url: location.href,
+    readyState: document.readyState,
+    visibleTextLength: (document.body?.innerText || "").trim().length,
     userLinks: [...document.querySelectorAll('a[href^="/users/"]')]
       .map(link => link.getAttribute("href") || "")
   }));
-  if (!profile.visibleText.trim()) {
-    throw new Error("Public profile rendered no visible text.");
-  }
-
-  const uuid = profile.userLinks
-    .map(href => href.match(/^\/users\/([0-9a-f-]{36})(?:\/|$)/i)?.[1])
-    .find(Boolean);
   if (!uuid) {
-    throw new Error("Could not identify the public user history route from profile links.");
+    throw new Error("Musicat profile did not expose its public history link after 25 seconds: " + JSON.stringify(profile));
   }
 
   const historyUrl = new URL(`/users/${uuid}/history`, "https://musicat.fm");
