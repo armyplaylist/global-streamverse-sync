@@ -148,10 +148,12 @@ async function loadScrobble(){
       const profile=await profileResponse.json();
       status.textContent="Historial de otras fuentes: "+Number(profile.total_streams||0).toLocaleString()+" escuchas guardadas · "+Number(profile.unique_tracks||0).toLocaleString()+" canciones diferentes.";
       const recent=Array.isArray(profile.recent_events)?profile.recent_events:[];
-      if(recent.length){
-        const hist=document.getElementById("scrobbleConnections");
-        const summary=document.createElement("p");summary.textContent="Última escucha importada: "+formatLocal(profile.last_played_at);summary.style.marginTop="10px";hist.append(summary);
-      }
+      const history=document.getElementById("scrobbleHistory");
+      if(!recent.length)history.innerHTML='<div class="empty">Todavía no hay escuchas importadas.</div>';
+      else history.replaceChildren(...recent.map(e=>{
+        const item=document.createElement("article"),meta=document.createElement("div"),title=document.createElement("b"),artist=document.createElement("small"),source=document.createElement("small"),time=document.createElement("time");
+        item.className="spotify-item";meta.className="spotify-meta";title.textContent=e.track||"Canción";artist.textContent=e.artist||"Artista";source.textContent=(e.source||"Fuente").toUpperCase()+(e.album?" · "+e.album:"");time.textContent=formatLocal(e.played_at);meta.append(title,artist,source);item.append(meta,time);return item;
+      }));
     }
   }catch(e){box.innerHTML='<div class="empty">No pudimos cargar las conexiones.</div>';status.textContent=e.message||"Error de scrobbling."}
 }
