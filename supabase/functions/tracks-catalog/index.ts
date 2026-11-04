@@ -176,7 +176,7 @@ async function loadHistoryDetail(baseUrl: string, serviceKey: string, params: UR
   }
   if (kind === "artist") {
     const artist = (params.get("artist_name") || "").trim();
-    if (!artist || artist.length > 300 || /[\\u0000-\\u001f]/.test(artist)) {
+    if (!artist || artist.length > 300 || /[\u0000-\u001f]/.test(artist)) {
       return json({ error: "Invalid artist name" }, 400);
     }
     const events = await fetchAllEvents(baseUrl, serviceKey, "artist=eq." + encodeURIComponent(artist));
