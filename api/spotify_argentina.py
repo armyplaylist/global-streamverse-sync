@@ -118,14 +118,17 @@ def spotify_argentina(request: Request):
             detail="Falta configurar la clave privada CHECKLEAKED_RAPIDAPI_KEY en Vercel.",
         )
 
-    headers = {"x-rapidapi-key": api_key}
-    rapidapi_host = os.getenv("CHECKLEAKED_RAPIDAPI_HOST", "").strip()
-    if rapidapi_host:
-        headers["x-rapidapi-host"] = rapidapi_host
+    # The configured secret is a RapidAPI app key, so use the RapidAPI
+    # gateway (not the direct CheckLeaked portal URL).
+    rapidapi_host = os.getenv("CHECKLEAKED_RAPIDAPI_HOST", "spotify81.p.rapidapi.com").strip()
+    headers = {
+        "x-rapidapi-key": api_key,
+        "x-rapidapi-host": rapidapi_host,
+    }
 
     try:
         response = requests.get(
-            "https://spotify-proxy.checkleaked.cc/spotify-data/top_200_tracks",
+            f"https://{rapidapi_host}/top_200_tracks",
             params={
                 "period": "daily",
                 "country": "ar",
