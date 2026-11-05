@@ -128,7 +128,7 @@ def spotify_argentina(request: Request):
 
     try:
         response = requests.get(
-            f"https://{rapidapi_host}/top_200_tracks",
+            f"https://{rapidapi_host}/spotify-data/top_200_tracks",
             params={
                 "period": "daily",
                 "country": "ar",
