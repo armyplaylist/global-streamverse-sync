@@ -100,15 +100,51 @@ function Analytics({refreshKey}){
   loading&&!data?h(Empty,null,"Cargando estadísticas verificadas…"):null,error?h(Empty,null,error):null,
   data?h(React.Fragment,null,
    h("div",{className:"metric-grid four"},h(Metric,{label:"Streams públicos",value:summary.public_profile_streams,note:"Suma de perfiles con consentimiento"}),h(Metric,{label:"Streams Musicat",value:cs.total_streams,note:"Catálogo disponible"}),h(Metric,{label:"Perfiles públicos",value:summary.public_profiles}),h(Metric,{label:"Países representados",value:summary.countries_represented})),
-   h("div",{className:"content-tabs"},[["overview","Resumen"],["tracks","Canciones"],["albums","Álbumes"],["countries","Países"]].map(([k,v])=>h("button",{key:k,className:tab===k?"active":"",onClick:()=>{setTab(k);setQuery("")}},v))),
+   h("div",{className:"content-tabs"},[["overview","Resumen"],["tracks","Canciones"],["albums","Álbumes"],["countries","Países"],["argentina","🇦🇷 Spotify Argentina"]].map(([k,v])=>h("button",{key:k,className:tab===k?"active":"",onClick:()=>{setTab(k);setQuery("")}},v))),
    tab==="overview"?h("div",{className:"dashboard-grid"},h("section",{className:"surface"},h("div",{className:"surface-head"},h("h2",null,"Canciones recientes"),h("span",null,"Muestra de actividad")),(data.recent_tracks_sample||[]).slice(0,8).map((r,i)=>h("div",{className:"list-row",key:i},h("span",{className:"list-rank"},String(i+1).padStart(2,"0")),h("span",{className:"list-main"},h("b",null,r.track),h("small",null,r.artist)),h("b",{className:"list-count"},fmt(r.recent_plays_sampled))))),h("section",{className:"surface"},h("div",{className:"surface-head"},h("h2",null,"ARMY por país"),h("span",null,"Streams públicos")),(data.top_countries||[]).slice(0,8).map((r,i)=>h("div",{className:"list-row",key:r.country_code},h("span",{className:"list-rank"},String(i+1).padStart(2,"0")),h("span",{className:"list-main"},h("b",null,flag(r.country_code)+" "+(COUNTRIES[r.country_code]||r.country_code)),h("small",null,r.members+" perfiles")),h("b",{className:"list-count"},fmt(r.streams))))),h("section",{className:"surface wide"},h("div",{className:"surface-head"},h("h2",null,"Perfiles destacados"),h("span",null,"Participación pública")),(data.top_members||[]).slice(0,10).map((m,i)=>h("a",{className:"list-row member-list-row",href:"/profile.html?u="+encodeURIComponent(m.handle),key:m.handle},h("span",{className:"list-rank"},String(i+1).padStart(2,"0")),h("span",{className:"list-main"},h("b",null,flag(m.country_code)+" "+m.display_name),h("small",null,"@"+m.handle)),h("b",{className:"list-count"},fmt(m.total_streams)))))):null,
    tab==="tracks"||tab==="albums"?h(React.Fragment,null,h("div",{className:"toolbar"},h("div",{className:"period-switch"},[["today","Hoy"],["week","7 días"],["month","Mes"],["total","Total"]].map(([k,v])=>h("button",{key:k,className:period===k?"active":"",onClick:()=>setPeriod(k)},v))),h("input",{className:"search-input",value:query,onChange:e=>setQuery(e.target.value),placeholder:"Buscar canción, artista o álbum…"})),h("section",{className:"surface"},(tab==="tracks"?tracks:albums.filter(a=>(a.name+" "+a.type).toLocaleLowerCase().includes(term))).slice(0,100).map((r,i)=>h("div",{className:"catalog-row",key:tab==="tracks"?(r.musicat_track_id||i):r.uri},h("span",{className:"list-rank"},String(i+1).padStart(2,"0")),h("img",{src:safeUrl(tab==="tracks"?r.album_image_url:r.image)||"/cover-fallback.svg",alt:"",loading:"lazy"}),h("span",{className:"list-main"},h("b",null,tab==="tracks"?r.track_name:r.name),h("small",null,tab==="tracks"?r.artist_name:(r.type||"Álbum")+" · "+r.count+" canciones")),h("b",{className:"list-count"},fmt(tab==="tracks"?r[key]:r[period])))))):null,
-   tab==="countries"?h("section",{className:"surface"},(data.top_countries||[]).map((r,i)=>h("div",{className:"list-row",key:r.country_code},h("span",{className:"list-rank"},String(i+1).padStart(2,"0")),h("span",{className:"list-main"},h("b",null,flag(r.country_code)+" "+(COUNTRIES[r.country_code]||r.country_code)),h("small",null,r.members+" perfiles públicos")),h("b",{className:"list-count"},fmt(r.streams))))):null,
-   h("p",{className:"data-note"},"Fuente pública: Musicat. Los rankings de canciones recientes son una muestra limitada del historial disponible, no un ranking histórico completo. Última consulta: "+when(data.generated_at)+".")
+   tab==="argentina"?h(SpotifyArgentina,{refreshKey}):null,\n   tab==="countries"?h("section",{className:"surface"},(data.top_countries||[]).map((r,i)=>h("div",{className:"list-row",key:r.country_code},h("span",{className:"list-rank"},String(i+1).padStart(2,"0")),h("span",{className:"list-main"},h("b",null,flag(r.country_code)+" "+(COUNTRIES[r.country_code]||r.country_code)),h("small",null,r.members+" perfiles públicos")),h("b",{className:"list-count"},fmt(r.streams))))):null,
+   tab!=="argentina"?h("p",{className:"data-note"},"Fuente pública: Musicat. Los rankings de canciones recientes son una muestra limitada del historial disponible, no un ranking histórico completo. Última consulta: "+when(data.generated_at)+"."):null
   ):null
  );
 }
-function Catalog({kind,refreshKey}){
+
+function SpotifyArgentina({refreshKey}){
+ const[data,setData]=useState(null),[loading,setLoading]=useState(true),[error,setError]=useState(""),[onlyBts,setOnlyBts]=useState(true);
+ useEffect(()=>{let live=true;setLoading(true);api("/api/spotify-argentina").then(d=>{if(live){setData(d);setError("")}}).catch(e=>live&&setError(e.message)).finally(()=>live&&setLoading(false));return()=>{live=false}},[refreshKey]);
+ const rows=onlyBts?(data?.bts_tracks||[]):(data?.rows||[]);
+ const n=v=>Number(v||0).toLocaleString("es-AR");
+ const date=data?.chart_date?new Date(data.chart_date+"T12:00:00").toLocaleDateString("es-AR",{day:"2-digit",month:"long",year:"numeric"}):"—";
+ return h("section",{className:"spotify-ar"},
+  h("div",{className:"spotify-ar-head"},
+   h("div",null,h("span",{className:"eyebrow"},"SPOTIFY CHARTS · DAILY TOP 200"),h("h2",null,"🇦🇷 Argentina"),h("p",null,"Seguimiento de BTS, movimientos diarios y distancia entre posiciones.")),
+   h("button",{className:"button secondary small",onClick:()=>{setLoading(true);api("/api/spotify-argentina?refresh=1").then(setData).catch(e=>setError(e.message)).finally(()=>setLoading(false))}},"Actualizar")
+  ),
+  loading&&!data?h("div",{className:"empty-state"},"Consultando el chart de Argentina…"):null,
+  error?h("div",{className:"empty-state"},h("b",null,"Chart pendiente de conexión"),h("p",null,error),h("small",null,"La clave se configura de forma privada en Vercel; nunca debe publicarse en el código.")):null,
+  data?h(React.Fragment,null,
+   h("div",{className:"spotify-ar-summary"},
+    h("article",null,h("small",null,"Canciones BTS en el Top 200"),h("strong",null,String((data.bts_tracks||[]).length))),
+    h("article",null,h("small",null,"Canción BTS mejor posicionada"),h("strong",null,data.bts_tracks?.length?"#"+data.bts_tracks[0].rank:"—")),
+    h("article",null,h("small",null,"Puesto de entrada"),h("strong",null,"#200 · "+n(data.rows?.[199]?.streams)+" streams"))
+   ),
+   h("div",{className:"spotify-ar-controls"},
+    h("div",{className:"period-switch"},h("button",{className:onlyBts?"active":"",onClick:()=>setOnlyBts(true)},"Solo BTS"),h("button",{className:!onlyBts?"active":"",onClick:()=>setOnlyBts(false)},"Top 200")),
+    h("span",null,"Chart: "+date+(data.stale?" · dato anterior disponible":""))
+   ),
+   rows.length?h("div",{className:"spotify-ar-list"},rows.map(row=>h("article",{className:"spotify-ar-row",key:row.spotify_uri||row.rank},
+    h("div",{className:"spotify-ar-rank"},"#"+row.rank,h("small",{className:row.movement>0?"trend-up":row.movement<0?"trend-down":""},row.movement>0?"▲ "+row.movement:row.movement<0?"▼ "+Math.abs(row.movement):"—")),
+    row.image?h("img",{src:safeUrl(row.image),alt:"",loading:"lazy"}):h("span",{className:"spotify-ar-cover"},"♫"),
+    h("div",{className:"spotify-ar-main"},h("b",null,row.track),h("small",null,row.artists.join(", ")),h("strong",null,n(row.streams)+" streams")),
+    h("div",{className:"spotify-ar-gaps"},h("span",null,"Gap ↑ ",h("b",null,row.gap_to_above===null?"—":n(row.gap_to_above))),h("span",null,"Gap ↓ ",h("b",null,row.gap_to_below===null?"—":n(row.gap_to_below))),h("span",null,"Gap #200 ",h("b",null,n(row.gap_to_200)))),
+    h("div",{className:"spotify-ar-outlook"},h("span",{className:"risk-pill "+(row.risk_label==="Riesgo alto"?"high":row.risk_label==="Vigilar"?"watch":"safe")},row.risk_label),h("b",null,row.up_probability+"% ↑"),h("small",null,"Prob. orientativa de subir"),h("small",null,row.down_risk+"% riesgo de bajar"))
+   ))):h("div",{className:"empty-state"},"No hay canciones de BTS en este chart para la fecha recibida."),
+   h("p",{className:"data-note"},"Gap ↑ = streams que faltan para alcanzar al puesto anterior. Gap ↓ = ventaja sobre el puesto siguiente. Gap #200 = ventaja sobre el umbral de salida. El índice de subida/bajada es orientativo: usa movimiento y diferencias de streams del mismo día, no es una probabilidad estadística ni garantiza el resultado."),
+   h("p",{className:"data-note"},"Fuente: proveedor independiente de datos de Spotify Charts. El Top 200 no incluye streams de canciones fuera del ranking; por eso no se asignan probabilidades de entrada a canciones que no aparecen en él.")
+  ):null
+ );
+}
+\nfunction Catalog({kind,refreshKey}){
  const[payload,setPayload]=useState(null),[loading,setLoading]=useState(true),[error,setError]=useState(""),[period,setPeriod]=useState("total"),[query,setQuery]=useState(""),[selected,setSelected]=useState(null),[detail,setDetail]=useState(null),[detailLoading,setDetailLoading]=useState(false);
  useEffect(()=>{let live=true;setLoading(true);api("/api/catalog").then(d=>live&&setPayload(d)).catch(e=>live&&setError(e.message)).finally(()=>live&&setLoading(false));return()=>{live=false}},[refreshKey]);
  const rows=(payload?.rows||[]).filter(r=>r.match_status==="matched"),albums=useMemo(()=>{const map=new Map();rows.forEach(r=>{if(!r.album_uri||!r.album_name)return;let a=map.get(r.album_uri);if(!a){a={uri:r.album_uri,name:r.album_name,image:r.album_image_url,type:r.album_type,release:r.album_release_date,tracks:[],total:0,today:0,week:0,month:0};map.set(r.album_uri,a)}const id=r.musicat_track_id||r.track_name;if(!a.tracks.some(t=>(t.musicat_track_id||t.track_name)===id))a.tracks.push(r);a.total+=Number(r.total_streams)||0;a.today+=Number(r.today_streams)||0;a.week+=Number(r.week_streams)||0;a.month+=Number(r.month_streams)||0});return[...map.values()].sort((a,b)=>b.total-a.total)},[payload]);
