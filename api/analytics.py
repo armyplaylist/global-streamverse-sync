@@ -261,3 +261,4 @@ def catalog():
     with _catalog_lock:
         _catalog_cache.update({"created": time.time(), "data": data})
     return JSONResponse(data, headers={"Cache-Control": "public, max-age=45"})
+
