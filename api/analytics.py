@@ -365,7 +365,7 @@ def spotify_argentina():
     try:
         response = requests.get(
             "https://spotify-proxy.checkleaked.cc/spotify-data/top_200_tracks",
-            params={"period": "daily", "country": "ar"},
+            params={"period": "daily", "country": "ar", "cache": "false" if refresh else "true"},
             headers=headers,
             timeout=25,
         )
