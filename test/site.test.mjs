@@ -73,7 +73,14 @@ test("private profile editing is owner-authenticated", () => {
   assert.match(app, /isPublic/);
 });
 
-test("private profile shows Musicat sync health without exposing controls publicly", () => {\n  assert.match(app, /sync-status-card/);\n  assert.match(app, /participant\\?\.last_synced_at/);\n  assert.match(app, /participant\\?\.last_error/);\n  assert.match(app, /automáticamente cada diez minutos/);\n});\n\ntest("public profile RPC excludes private Spotify history", () => {
+test("private profile shows Musicat sync health without exposing controls publicly", () => {
+  assert.match(app, /sync-status-card/);
+  assert.match(app, /participant\?\.last_synced_at/);
+  assert.match(app, /participant\?\.last_error/);
+  assert.match(app, /automáticamente cada diez minutos/);
+});
+
+test("public profile RPC excludes private Spotify history", () => {
   const migration = read("supabase/migrations/20261104150000_keep_spotify_history_private.sql");
   assert.match(migration, /create or replace function public\.get_public_profile/);
   assert.match(migration, /where e\.provider = 'musicat'/);
