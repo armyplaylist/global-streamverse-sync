@@ -1,7 +1,10 @@
 {
   "rewrites": [
-    { "source": "/legacy/(.*)", "destination": "/site/$1" },
-    { "source": "/legacy", "destination": "/site/index.html" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/analytics", "destination": "/index.html" },
+    { "source": "/tracks", "destination": "/index.html" },
+    { "source": "/tracks.html", "destination": "/index.html" },
+    { "source": "/albums", "destination": "/index.html" },
+    { "source": "/profile", "destination": "/index.html" },
+    { "source": "/profile.html", "destination": "/index.html" }
   ]
 }
