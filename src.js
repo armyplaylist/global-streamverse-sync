@@ -126,7 +126,7 @@ function SpotifyArgentina({refreshKey}){
    h("div",{className:"spotify-ar-summary"},
     h("article",null,h("small",null,"Canciones BTS en el Top 200"),h("strong",null,String((data.bts_tracks||[]).length))),
     h("article",null,h("small",null,"Canción BTS mejor posicionada"),h("strong",null,data.bts_tracks?.length?"#"+data.bts_tracks[0].rank:"—")),
-    h("article",null,h("small",null,"Puesto de entrada"),h("strong",null,"#200 · "+n(data.rows?.[199]?.streams)+" streams"))
+    h("article",null,h("small",null,"Puesto de entrada"),h("strong",null,"#200 · "+n(data.rows?.find(row=>row.rank===200)?.streams)+" streams"))
    ),
    h("div",{className:"spotify-ar-controls"},
     h("div",{className:"period-switch"},h("button",{className:onlyBts?"active":"",onClick:()=>setOnlyBts(true)},"Solo BTS"),h("button",{className:!onlyBts?"active":"",onClick:()=>setOnlyBts(false)},"Top 200")),
