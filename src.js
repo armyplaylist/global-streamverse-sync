@@ -111,14 +111,14 @@ function Analytics({refreshKey}){
 
 function SpotifyArgentina({refreshKey}){
  const[data,setData]=useState(null),[loading,setLoading]=useState(true),[error,setError]=useState(""),[onlyBts,setOnlyBts]=useState(true);
- useEffect(()=>{let live=true;setLoading(true);api("/api/spotify-argentina").then(d=>{if(live){setData(d);setError("")}}).catch(e=>live&&setError(e.message)).finally(()=>live&&setLoading(false));return()=>{live=false}},[refreshKey]);
+ useEffect(()=>{let live=true;setLoading(true);api("/api/spotify_argentina").then(d=>{if(live){setData(d);setError("")}}).catch(e=>live&&setError(e.message)).finally(()=>live&&setLoading(false));return()=>{live=false}},[refreshKey]);
  const rows=onlyBts?(data?.bts_tracks||[]):(data?.rows||[]);
  const n=v=>Number(v||0).toLocaleString("es-AR");
  const date=data?.chart_date?new Date(data.chart_date+"T12:00:00").toLocaleDateString("es-AR",{day:"2-digit",month:"long",year:"numeric"}):"—";
  return h("section",{className:"spotify-ar"},
   h("div",{className:"spotify-ar-head"},
    h("div",null,h("span",{className:"eyebrow"},"SPOTIFY CHARTS · DAILY TOP 200"),h("h2",null,"🇦🇷 Argentina"),h("p",null,"Seguimiento de BTS, movimientos diarios y distancia entre posiciones.")),
-   h("button",{className:"button secondary small",onClick:()=>{setLoading(true);api("/api/spotify-argentina?refresh=1").then(setData).catch(e=>setError(e.message)).finally(()=>setLoading(false))}},"Actualizar")
+   h("button",{className:"button secondary small",onClick:()=>{setLoading(true);api("/api/spotify_argentina?refresh=1").then(setData).catch(e=>setError(e.message)).finally(()=>setLoading(false))}},"Actualizar")
   ),
   loading&&!data?h("div",{className:"empty-state"},"Consultando el chart de Argentina…"):null,
   error?h("div",{className:"empty-state"},h("b",null,"Chart pendiente de conexión"),h("p",null,error),h("small",null,"La clave se configura de forma privada en Vercel; nunca debe publicarse en el código.")):null,
