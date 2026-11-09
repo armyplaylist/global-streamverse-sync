@@ -5,6 +5,9 @@
     { "source": "/tracks.html", "destination": "/index.html" },
     { "source": "/albums", "destination": "/index.html" },
     { "source": "/profile", "destination": "/index.html" },
-    { "source": "/profile.html", "destination": "/index.html" }
+    { "source": "/profile.html", "destination": "/index.html" },
+    { "source": "/sky/(.*)", "destination": "/index.html" },
+    { "source": "/gallery", "destination": "/index.html" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
