@@ -1,14 +1,9 @@
 {
-  "name": "global-streamverse-sync",
-  "version": "0.1.0",
+  "name": "army-christmas-sky",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "check": "node scripts/check-musicat.mjs",
-    "sync": "node scripts/sync-musicat.mjs",
     "test": "node --test"
-  },
-  "devDependencies": {
-    "playwright": "1.56.1"
   }
 }
